@@ -22,13 +22,14 @@ execute:
 
 ```{r}
 #| label: wd-1-csv-1
-
+teacher_evals <- read_csv(here::here("Week 3", "teacher_evals.csv"))
 ```
 
 -   `csv` Example 2
 
 ```{r}
 #| label: wd-1-csv-2
+surveys <- read.csv(here::here("surveys.csv"))
 
 ```
 
@@ -45,7 +46,15 @@ execute:
 
 ```{r}
 #| label: wd-2-ex-1
-
+income_info <- ca_childcare |> 
+    group_by(region, study_year) |> 
+    summarize(median_income = median(mhi_2018, na.rm = TRUE),
+              .groups = "drop") |>
+    pivot_wider(names_from = study_year, 
+                values_from = median_income) |> 
+    arrange(desc('2018')
+            ) |>
+    select(region, '2008', '2018')
 ```
 
 -   Example removing specified columns
@@ -68,28 +77,45 @@ execute:
 
 ```{r}
 #| label: wd-3-numeric-ex-1
-
+ca_childcare |>
+    filter(study_year == 2018, 
+    mc_infant == min(mc_infant, na.rm = TRUE)
+    ) |>
+    select(region, 
+            mc_infant, 
+            mhi_2018) |> 
+    filter(mhi_2018 == min(mhi_2018, na.rm = TRUE)
+           ) |>
+    select(region, mhi_2018)
 ```
 
 -   Numeric Example 2
 
 ```{r}
 #| label: wd-3-numeric-ex-1
-
+person_suspect <- person |> 
+    filter(license_id %in% c("423327", "664760")
+) 
 ```
 
 -   Character Example 1 (any context)
 
 ```{r}
 #| label: wd-3-character
-
+drivers_license_1 <- drivers_license |> 
+    filter(
+        gender == "male",
+        str_detect(plate_number, "H42W") 
+    ) 
 ```
 
 -   Character Example 2 (example must use functions from **stringr**)
 
 ```{r}
 #| label: wd-3-string
-
+get_fit_now_murder <- get_fit_now_member |> 
+    filter(name %in% c("Tushar Chandra", "Jeremy Bowers")
+           ) 
 ```
 
 -   Date (example must use functions from **lubridate**)
