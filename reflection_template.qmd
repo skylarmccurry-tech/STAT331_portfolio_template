@@ -8,6 +8,13 @@ editor: visual
 execute: 
   eval: false
   echo: true
+embed-resources: true
+code-tools: true
+code-fold: true
+execute: 
+  echo: true
+  warning: false
+  message: false
 ---
 
 [**My Grade:**]{.underline} I believe my grade equivalent to course work evidenced below to be an \_\_.
@@ -93,9 +100,16 @@ ca_childcare |>
 
 ```{r}
 #| label: wd-3-numeric-ex-1
-person_suspect <- person |> 
-    filter(license_id %in% c("423327", "664760")
-) 
+income_info <- ca_childcare |> 
+filter(study_year %in% c(2008, 2018)
+      ) |>
+  group_by(region, study_year) |> 
+  summarize(median_income = median(mhi_2018, na.rm = TRUE),
+            .groups = "drop") |>
+  pivot_wider(names_from = study_year, 
+              values_from = median_income) |> 
+  arrange(desc('2018')
+)
 ```
 
 -   Character Example 1 (any context)
@@ -104,8 +118,8 @@ person_suspect <- person |>
 #| label: wd-3-character
 drivers_license_1 <- drivers_license |> 
     filter(
-        gender == "male",
-        str_detect(plate_number, "H42W") 
+            gender == "male",
+            str_detect(plate_number, "H42W") 
     ) 
 ```
 
@@ -113,9 +127,9 @@ drivers_license_1 <- drivers_license |>
 
 ```{r}
 #| label: wd-3-string
-get_fit_now_murder <- get_fit_now_member |> 
-    filter(name %in% c("Tushar Chandra", "Jeremy Bowers")
-           ) 
+person_annabel <- person |> 
+    filter(str_detect(name, regex("^Annabel", ignore_case = TRUE)), 
+            address_street_name == "Franklin Ave") 
 ```
 
 -   Date (example must use functions from **lubridate**)
@@ -159,7 +173,21 @@ get_fit_now_murder <- get_fit_now_member |>
 
 ```{r}
 #| label: wd-4-string
-
+crime_scene_report_three <- crime_scene_report |>
+filter(type == "murder", 
+      city == "SQL City", 
+      date == "20180115") |> 
+    select(date, 
+            type, 
+            city, 
+            description) 
+    person_three <- person |> 
+    filter(address_street_name == "Northwestern Dr") |> 
+    arrange(desc(address_number)) 
+    person_annabel <- person |> 
+    filter(
+        str_detect(name, regex("^Annabel", ignore_case = TRUE)), 
+        address_street_name == "Franklin Ave") 
 ```
 
 -   Date (example must use functions from **lubridate**)
@@ -175,7 +203,10 @@ get_fit_now_murder <- get_fit_now_member |>
 
 ```{r}
 #| label: wd-5-left-ex-1
-
+ca_childcare <- left_join(x = ca_childcare, 
+                          y = tax_rev, 
+                          by = join_by(county_name == entity_name, study_year == year)
+                          )
 ```
 
 -   `right_join()` Example 1
@@ -196,7 +227,10 @@ get_fit_now_murder <- get_fit_now_member |>
 
 ```{r}
 #| label: wd-5-inner-ex-1
-
+ca_childcare <- inner_join(x = counties, 
+                          y = childcare_costs, 
+                          by = join_by(county_fips_code == county_fips_code)) |> 
+    filter(state_name == "California") 
 ```
 
 -   `inner_join()` Example 2
@@ -235,7 +269,21 @@ get_fit_now_murder <- get_fit_now_member |>
 
 ```{r}
 #| label: wd-7-wide
-
+income_info <- ca_childcare |> 
+filter(study_year %in% c(2008, 2018)
+) |>
+  group_by(region, study_year) |> 
+    summarize(median_income = median(mhi_2018, na.rm = TRUE),
+              .groups = "drop") |>
+    pivot_wider(names_from = study_year, 
+                values_from = median_income) |> 
+    arrange(desc('2018')
+) |>
+    select(region, '2008', '2018') |> 
+    rename('Region' = 'region',
+    'Median Income 2008' = '2008',
+    'Median Income 2018' = '2018'
+)
 ```
 
 ## Reproducibility
@@ -256,14 +304,35 @@ The following assignments satisfy the above criteria:
 
 ```{r}
 #| label: r-2-1
-
+plot_median_mc_infant <- median_mc_infant |> 
+    ggplot(mapping = aes(x = mc_infant, 
+                         y = mhi_2018)
+    ) +
+    geom_point(alpha = 0.2) + 
+    geom_smooth(method = "lm", se = FALSE, color = "darkblue")+ 
+    theme_bw() +
+    labs(x = "Infant Cost for Center Based Child Care", 
+         y = "",
+         title = "Relationship between median household income and full-time median weekly price for center-based childcare for an infant in California in 2018 ($)"
+    ) +
+    scale_x_continuous(
+        labels = scales::label_dollar()
+    ) + 
+    scale_y_continuous(
+        labels = scales::label_dollar()
+    )
 ```
 
 -   Example of **dplyr** pipeline
 
 ```{r}
 #| label: r-2-2
-
+income_info <- ca_childcare |> 
+filter(study_year %in% c(2008, 2018)
+      ) |>
+  group_by(region, study_year) |> 
+    summarize(median_income = median(mhi_2018, na.rm = TRUE),
+              .groups = "drop") 
 ```
 
 -   Example of function formatting
@@ -279,7 +348,11 @@ The following assignments satisfy the above criteria:
 
 ```{r}
 #| label: r-3-example
-
+teacher_evals_clean |>
+  distinct(teacher_id, .keep_all = TRUE) |>
+  summarize(mean_seniority = mean(seniority, na.rm = TRUE)
+    ) |> 
+    ungroup() 
 ```
 
 -   Example (function stops)
@@ -297,28 +370,148 @@ The following assignments satisfy the above criteria:
 
 ```{r}
 #| label: dvs-1-num
-
+plot_median_mc_infant <- median_mc_infant |> 
+    ggplot(mapping = aes(x = mc_infant, 
+                         y = mhi_2018)
+    ) +
+    geom_point(alpha = 0.2) + 
+    geom_smooth(method = "lm", se = FALSE, color = "darkblue")+ 
+    theme_bw() +
+    labs(x = "Infant Cost for Center Based Child Care", 
+         y = "",
+         title = "Relationship between median household income and full-time median weekly price for center-based childcare for an infant in California in 2018 ($)"
+    ) +
+    scale_x_continuous(
+        labels = scales::label_dollar()
+    ) + 
+    scale_y_continuous(
+        labels = scales::label_dollar()
+    )
 ```
 
 -   At least one numeric variable and one categorical variable
 
 ```{r}
 #| label: dvs-2-num-cat
-
+untitled_pink <- c("F" = "#e75480",
+                  "M" = "#6a5acd") 
+ggplot(surveys, aes(x = sex, y = weight, fill = sex)) + 
+    geom_boxplot(outlier.shape = NA) +
+    scale_fill_manual(values = untitled_pink) + 
+    labs(
+      title = "Relationship between Sex and Weight", 
+      x = "Sex", 
+      y = "Weight (g)") 
 ```
 
 -   At least two categorical variables
 
 ```{r}
 #| label: dvs-2-cat
-
+ca_childcare |> 
+    filter(study_year >= 2008, study_year <= 2018) |>
+    group_by(region, study_year) |> 
+    select(region, study_year, mc_infant, mc_toddler, mc_preschool) |> 
+    pivot_longer( 
+                 cols = starts_with("mc_"), 
+                 names_to = "age_group", 
+                 values_to = "median_price") |> 
+    mutate(age_group = case_when(age_group == "mc_infant" ~ "Infant",
+                            age_group == "mc_toddler" ~ "Toddler", 
+                            age_group == "mc_preschool" ~ "Preschool"),
+    age_group = factor(age_group, levels = c("Infant", "Toddler", "Preschool"))
+    ) |>
+    ggplot(mapping = aes(x = study_year, 
+                         y = median_price, 
+                         color = fct_reorder2(.f = region, 
+                                             .x = study_year, 
+                                             .y = median_price))
+           ) + 
+    geom_point(size = 0.2,
+               alpha = 0.9) + 
+    geom_smooth(se = FALSE,
+                linewidth = 0.5, 
+                size = 0.6, 
+                alpha = 0.2) +
+    scale_color_manual(values = rainbow(10)
+    ) +
+    facet_wrap(~ age_group, nrow = 1) + 
+    labs(x = "Study Year", 
+         y = "", 
+         title = "Weekly Median Price for Center-Based Childcare($)", 
+         color = "California Region"
+         ) +
+    theme_bw() + 
+    theme(
+      plot.title = element_text(size = 8),
+      axis.text.x = element_text(size = 5),
+      axis.text.y = element_text(size = 5),
+      axis.title.x = element_text(size = 8),
+      legend.title = element_text(size = 8),
+      legend.text = element_text(size = 7),
+      legend.key.height = unit(.4, "cm"),
+      aspect.ratio = 1) +
+    scale_x_continuous(
+        breaks = seq(2008, 2018, by = 2)
+    ) + 
+  scale_y_continuous(
+    limits = c(100,500),
+    breaks = seq(100, 500, by = 100))
 ```
 
 -   Dates (time series plot)
 
 ```{r}
 #| label: dvs-2-date
-
+ca_childcare |> 
+    filter(study_year >= 2008, study_year <= 2018) |>
+    group_by(region, study_year) |> 
+    select(region, study_year, mc_infant, mc_toddler, mc_preschool) |> 
+    pivot_longer( 
+                 cols = starts_with("mc_"), 
+                 names_to = "age_group", 
+                 values_to = "median_price") |> 
+    mutate(age_group = case_when(age_group == "mc_infant" ~ "Infant",
+                            age_group == "mc_toddler" ~ "Toddler", 
+                            age_group == "mc_preschool" ~ "Preschool"),
+    age_group = factor(age_group, levels = c("Infant", "Toddler", "Preschool"))
+    ) |>
+    ggplot(mapping = aes(x = study_year, 
+                         y = median_price, 
+                         color = fct_reorder2(.f = region, 
+                                             .x = study_year, 
+                                             .y = median_price))
+           ) + 
+    geom_point(size = 0.2,
+               alpha = 0.9) + 
+    geom_smooth(se = FALSE,
+                linewidth = 0.5, 
+                size = 0.6, 
+                alpha = 0.2) +
+    scale_color_manual(values = rainbow(10)
+    ) +
+    facet_wrap(~ age_group, nrow = 1) + 
+    labs(x = "Study Year", 
+         y = "", 
+         title = "Weekly Median Price for Center-Based Childcare($)", 
+         color = "California Region"
+         ) +
+    theme_bw() + 
+    theme(
+      plot.title = element_text(size = 8),
+      axis.text.x = element_text(size = 5),
+      axis.text.y = element_text(size = 5),
+      axis.title.x = element_text(size = 8),
+      legend.title = element_text(size = 8),
+      legend.text = element_text(size = 7),
+      legend.key.height = unit(.4, "cm"),
+      aspect.ratio = 1) +
+    scale_x_continuous(
+        breaks = seq(2008, 2018, by = 2)
+    ) + 
+  scale_y_continuous(
+    limits = c(100,500),
+    breaks = seq(100, 500, by = 100))
 ```
 
 **DVS-2: I use plot modifications to make my visualization clear to the reader.**
@@ -327,7 +520,55 @@ The following assignments satisfy the above criteria:
 
 ```{r}
 #| label: dvs-2-ex-1
-
+ca_childcare |> 
+    filter(study_year >= 2008, study_year <= 2018) |>
+    group_by(region, study_year) |> 
+    select(region, study_year, mc_infant, mc_toddler, mc_preschool) |> 
+    pivot_longer( 
+                 cols = starts_with("mc_"), 
+                 names_to = "age_group", 
+                 values_to = "median_price") |> 
+    mutate(age_group = case_when(age_group == "mc_infant" ~ "Infant",
+                            age_group == "mc_toddler" ~ "Toddler", 
+                            age_group == "mc_preschool" ~ "Preschool"),
+    age_group = factor(age_group, levels = c("Infant", "Toddler", "Preschool"))
+    ) |>
+    ggplot(mapping = aes(x = study_year, 
+                         y = median_price, 
+                         color = fct_reorder2(.f = region, 
+                                             .x = study_year, 
+                                             .y = median_price))
+           ) + 
+    geom_point(size = 0.2,
+               alpha = 0.9) + 
+    geom_smooth(se = FALSE,
+                linewidth = 0.5, 
+                size = 0.6, 
+                alpha = 0.2) +
+    scale_color_manual(values = rainbow(10)
+    ) +
+    facet_wrap(~ age_group, nrow = 1) + 
+    labs(x = "Study Year", 
+         y = "", 
+         title = "Weekly Median Price for Center-Based Childcare($)", 
+         color = "California Region"
+         ) +
+    theme_bw() + 
+    theme(
+      plot.title = element_text(size = 8),
+      axis.text.x = element_text(size = 5),
+      axis.text.y = element_text(size = 5),
+      axis.title.x = element_text(size = 8),
+      legend.title = element_text(size = 8),
+      legend.text = element_text(size = 7),
+      legend.key.height = unit(.4, "cm"),
+      aspect.ratio = 1) +
+    scale_x_continuous(
+        breaks = seq(2008, 2018, by = 2)
+    ) + 
+  scale_y_continuous(
+    limits = c(100,500),
+    breaks = seq(100, 500, by = 100))
 ```
 
 -   I can modify my colors to be accessible to anyone's eyes
@@ -341,21 +582,128 @@ The following assignments satisfy the above criteria:
 
 ```{r}
 #| label: dvs-2-ex-3
-
+ggplot(
+  data = surveys, 
+  mapping = aes(x = weight, y = species)
+) + 
+geom_boxplot(outlier.shape = NA) +
+geom_point(color = "steelblue", alpha = 0.5) + 
+labs( 
+  title = "Relathionship between different types of Rodents and Weight (g)", 
+  subtitle = "Y axis: Species of Rodents",
+  x = "Weight (g)", 
+  y = "") + 
+  theme_bw()
 ```
 
 -   I can modify the text in my plot to be more readable
 
 ```{r}
 #| label: dvs-2-ex-4
-
+ca_childcare |> 
+    filter(study_year >= 2008, study_year <= 2018) |>
+    group_by(region, study_year) |> 
+    select(region, study_year, mc_infant, mc_toddler, mc_preschool) |> 
+    pivot_longer( 
+                 cols = starts_with("mc_"), 
+                 names_to = "age_group", 
+                 values_to = "median_price") |> 
+    mutate(age_group = case_when(age_group == "mc_infant" ~ "Infant",
+                            age_group == "mc_toddler" ~ "Toddler", 
+                            age_group == "mc_preschool" ~ "Preschool"),
+    age_group = factor(age_group, levels = c("Infant", "Toddler", "Preschool"))
+    ) |>
+    ggplot(mapping = aes(x = study_year, 
+                         y = median_price, 
+                         color = fct_reorder2(.f = region, 
+                                             .x = study_year, 
+                                             .y = median_price))
+           ) + 
+    geom_point(size = 0.2,
+               alpha = 0.9) + 
+    geom_smooth(se = FALSE,
+                linewidth = 0.5, 
+                size = 0.6, 
+                alpha = 0.2) +
+    scale_color_manual(values = rainbow(10)
+    ) +
+    facet_wrap(~ age_group, nrow = 1) + 
+    labs(x = "Study Year", 
+         y = "", 
+         title = "Weekly Median Price for Center-Based Childcare($)", 
+         color = "California Region"
+         ) +
+    theme_bw() + 
+    theme(
+      plot.title = element_text(size = 8),
+      axis.text.x = element_text(size = 5),
+      axis.text.y = element_text(size = 5),
+      axis.title.x = element_text(size = 8),
+      legend.title = element_text(size = 8),
+      legend.text = element_text(size = 7),
+      legend.key.height = unit(.4, "cm"),
+      aspect.ratio = 1) +
+    scale_x_continuous(
+        breaks = seq(2008, 2018, by = 2)
+    ) + 
+  scale_y_continuous(
+    limits = c(100,500),
+    breaks = seq(100, 500, by = 100))
 ```
 
 -   I can reorder my legend to align with the colors in my plot
 
 ```{r}
 #| label: dvs-2-ex-5
-
+ca_childcare |> 
+    filter(study_year >= 2008, study_year <= 2018) |>
+    group_by(region, study_year) |> 
+    select(region, study_year, mc_infant, mc_toddler, mc_preschool) |> 
+    pivot_longer( 
+                 cols = starts_with("mc_"), 
+                 names_to = "age_group", 
+                 values_to = "median_price") |> 
+    mutate(age_group = case_when(age_group == "mc_infant" ~ "Infant",
+                            age_group == "mc_toddler" ~ "Toddler", 
+                            age_group == "mc_preschool" ~ "Preschool"),
+    age_group = factor(age_group, levels = c("Infant", "Toddler", "Preschool"))
+    ) |>
+    ggplot(mapping = aes(x = study_year, 
+                         y = median_price, 
+                         color = fct_reorder2(.f = region, 
+                                             .x = study_year, 
+                                             .y = median_price))
+           ) + 
+    geom_point(size = 0.2,
+               alpha = 0.9) + 
+    geom_smooth(se = FALSE,
+                linewidth = 0.5, 
+                size = 0.6, 
+                alpha = 0.2) +
+    scale_color_manual(values = rainbow(10)
+    ) +
+    facet_wrap(~ age_group, nrow = 1) + 
+    labs(x = "Study Year", 
+         y = "", 
+         title = "Weekly Median Price for Center-Based Childcare($)", 
+         color = "California Region"
+         ) +
+    theme_bw() + 
+    theme(
+      plot.title = element_text(size = 8),
+      axis.text.x = element_text(size = 5),
+      axis.text.y = element_text(size = 5),
+      axis.title.x = element_text(size = 8),
+      legend.title = element_text(size = 8),
+      legend.text = element_text(size = 7),
+      legend.key.height = unit(.4, "cm"),
+      aspect.ratio = 1) +
+    scale_x_continuous(
+        breaks = seq(2008, 2018, by = 2)
+    ) + 
+  scale_y_continuous(
+    limits = c(100,500),
+    breaks = seq(100, 500, by = 100))
 ```
 
 **DVS-3: I show creativity in my visualizations**
@@ -394,14 +742,36 @@ The following assignments satisfy the above criteria:
 
 ```{r}
 #| label: dvs-4-summarize
-
+teacher_evals_clean |>
+  distinct(teacher_id, .keep_all = TRUE) |>
+  summarize(mean_seniority = mean(seniority, na.rm = TRUE)
+    ) |> 
+    ungroup() 
 ```
 
 -   Example using `across()`
 
 ```{r}
 #| label: dvs-4-across
-
+teacher_evals_clean <- teacher_evals |>
+    rename(sex = gender) |>
+    filter(no_participants >= 10) |>
+    mutate(
+        across(c(teacher_id, 
+                course_id),
+                as.character),
+        across(c(academic_degree, sex), as.factor)
+    ) |>
+    select(course_id,
+           teacher_id,
+           question_no,
+           no_participants,
+           resp_share, 
+           SET_score_avg,
+           percent_failed_cur,
+           academic_degree,
+           seniority,
+           sex)
 ```
 
 **DVS-5: I can find summaries of variables across multiple groups.**
@@ -543,7 +913,55 @@ The following assignments satisfy the above criteria:
 
 ```{r}
 #| label: pe-4-2
-
+ca_childcare |> 
+    filter(study_year >= 2008, study_year <= 2018) |>
+    group_by(region, study_year) |> 
+    select(region, study_year, mc_infant, mc_toddler, mc_preschool) |> 
+    pivot_longer( 
+                 cols = starts_with("mc_"), 
+                 names_to = "age_group", 
+                 values_to = "median_price") |> 
+    mutate(age_group = case_when(age_group == "mc_infant" ~ "Infant",
+                            age_group == "mc_toddler" ~ "Toddler", 
+                            age_group == "mc_preschool" ~ "Preschool"),
+    age_group = factor(age_group, levels = c("Infant", "Toddler", "Preschool"))
+    ) |>
+    ggplot(mapping = aes(x = study_year, 
+                         y = median_price, 
+                         color = fct_reorder2(.f = region, 
+                                             .x = study_year, 
+                                             .y = median_price))
+           ) + 
+    geom_point(size = 0.2,
+               alpha = 0.9) + 
+    geom_smooth(se = FALSE,
+                linewidth = 0.5, 
+                size = 0.6, 
+                alpha = 0.2) +
+    scale_color_manual(values = rainbow(10)
+    ) +
+    facet_wrap(~ age_group, nrow = 1) + 
+    labs(x = "Study Year", 
+         y = "", 
+         title = "Weekly Median Price for Center-Based Childcare($)", 
+         color = "California Region"
+         ) +
+    theme_bw() + 
+    theme(
+      plot.title = element_text(size = 8),
+      axis.text.x = element_text(size = 5),
+      axis.text.y = element_text(size = 5),
+      axis.title.x = element_text(size = 8),
+      legend.title = element_text(size = 8),
+      legend.text = element_text(size = 7),
+      legend.key.height = unit(.4, "cm"),
+      aspect.ratio = 1) +
+    scale_x_continuous(
+        breaks = seq(2008, 2018, by = 2)
+    ) + 
+  scale_y_continuous(
+    limits = c(100,500),
+    breaks = seq(100, 500, by = 100))
 ```
 
 ## Data Simulation & Statisical Models
@@ -570,14 +988,17 @@ The following assignments satisfy the above criteria:
 
 ```{r}
 #| label: dsm-2-1
-
+reg_mod1 <- lm(mhi_2018 ~ mc_infant, data = median_mc_infant)
+summary(reg_mod1)
 ```
 
 -   Example 2
 
 ```{r}
 #| label: dsm-2-2
-
+chisq_table <- table(teacher_evals_compare$set_level, teacher_evals_compare$sen_level)
+chisq_table
+chisq.test(chisq_table)
 ```
 
 -   Example 3
