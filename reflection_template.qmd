@@ -53,15 +53,21 @@ surveys <- read.csv(here::here("surveys.csv"))
 
 ```{r}
 #| label: wd-2-ex-1
+#| Lab 4 question 5 
 income_info <- ca_childcare |> 
-    group_by(region, study_year) |> 
+filter(study_year %in% c(2008, 2018)
+) |>
+  group_by(region, study_year) |> 
     summarize(median_income = median(mhi_2018, na.rm = TRUE),
               .groups = "drop") |>
     pivot_wider(names_from = study_year, 
                 values_from = median_income) |> 
     arrange(desc('2018')
-            ) |>
-    select(region, '2008', '2018')
+) |>
+    select(region, '2008', '2018') |> 
+    rename('Region' = 'region',
+    'Median Income 2008' = '2008',
+    'Median Income 2018' = '2018')
 ```
 
 -   Example removing specified columns
@@ -84,31 +90,38 @@ income_info <- ca_childcare |>
 
 ```{r}
 #| label: wd-3-numeric-ex-1
-ca_childcare |>
-    filter(study_year == 2018, 
-    mc_infant == min(mc_infant, na.rm = TRUE)
-    ) |>
-    select(region, 
-            mc_infant, 
-            mhi_2018) |> 
-    filter(mhi_2018 == min(mhi_2018, na.rm = TRUE)
-           ) |>
-    select(region, mhi_2018)
+#| lab 4 question 6
+#| Is there a function that allows you to slice the min of a specific variable?
+#| I used slice_min to automatically get me the lowest median charge for center based childcare for infants in a specfic region. 
+
+ca_childcare |> 
+group_by(region) |>
+filter(study_year == 2018) |> 
+summarize(mc_infant = median(mc_infant, na.rm = TRUE)) |>
+slice_min(mc_infant)
 ```
 
 -   Numeric Example 2
 
 ```{r}
 #| label: wd-3-numeric-ex-1
+#| lab 4 question 5
+#| I would highly recommend filtering first, so you are summarizing a smaller dataset.
+#| In my revisons I filtered by 2008 and 2018 first so I could be working with a smaller dataset and have less room for error. 
 income_info <- ca_childcare |> 
 filter(study_year %in% c(2008, 2018)
-      ) |>
+) |>
   group_by(region, study_year) |> 
-  summarize(median_income = median(mhi_2018, na.rm = TRUE),
-            .groups = "drop") |>
-  pivot_wider(names_from = study_year, 
-              values_from = median_income) |> 
-  arrange(desc('2018')
+    summarize(median_income = median(mhi_2018, na.rm = TRUE),
+              .groups = "drop") |>
+    pivot_wider(names_from = study_year, 
+                values_from = median_income) |> 
+    arrange(desc('2018')
+) |>
+    select(region, '2008', '2018') |> 
+    rename('Region' = 'region',
+    'Median Income 2008' = '2008',
+    'Median Income 2018' = '2018'
 )
 ```
 
@@ -116,17 +129,17 @@ filter(study_year %in% c(2008, 2018)
 
 ```{r}
 #| label: wd-3-character
+#| lab 5 
 drivers_license_1 <- drivers_license |> 
-    filter(
-            gender == "male",
-            str_detect(plate_number, "H42W") 
-    ) 
+    filter(gender == "male",
+            str_detect(plate_number, "H42W")) 
 ```
 
 -   Character Example 2 (example must use functions from **stringr**)
 
 ```{r}
 #| label: wd-3-string
+#| lab 5 
 person_annabel <- person |> 
     filter(str_detect(name, regex("^Annabel", ignore_case = TRUE)), 
             address_street_name == "Franklin Ave") 
@@ -173,6 +186,7 @@ person_annabel <- person |>
 
 ```{r}
 #| label: wd-4-string
+#| lab 5 
 crime_scene_report_three <- crime_scene_report |>
 filter(type == "murder", 
       city == "SQL City", 
@@ -203,10 +217,10 @@ filter(type == "murder",
 
 ```{r}
 #| label: wd-5-left-ex-1
+#| lab 4 question 3 
 ca_childcare <- left_join(x = ca_childcare, 
                           y = tax_rev, 
-                          by = join_by(county_name == entity_name, study_year == year)
-                          )
+                          by = join_by(county_name == entity_name, study_year == year))
 ```
 
 -   `right_join()` Example 1
@@ -227,9 +241,14 @@ ca_childcare <- left_join(x = ca_childcare,
 
 ```{r}
 #| label: wd-5-inner-ex-1
+#| lab 4 question 2
+#| Do you want to keep EVERYTHING in both datasets?
+#| Your code doesn’t specify how these two datsets should be joined, so you are relying on R recognizing the names of the columns that are the same between the two datasets. I would strongly recommend telling R exactly how you want the data to be joined—this code is more resistant to changes in the data.
+#| I used an inner join, because I want to compare results from different counties. 
 ca_childcare <- inner_join(x = counties, 
                           y = childcare_costs, 
-                          by = join_by(county_fips_code == county_fips_code)) |> 
+                          by = join_by(county_fips_code == county_fips_code)
+                          ) |> 
     filter(state_name == "California") 
 ```
 
@@ -269,6 +288,7 @@ ca_childcare <- inner_join(x = counties,
 
 ```{r}
 #| label: wd-7-wide
+#| lab 4 question 5
 income_info <- ca_childcare |> 
 filter(study_year %in% c(2008, 2018)
 ) |>
@@ -304,6 +324,7 @@ The following assignments satisfy the above criteria:
 
 ```{r}
 #| label: r-2-1
+#| lab 4 question 8 
 plot_median_mc_infant <- median_mc_infant |> 
     ggplot(mapping = aes(x = mc_infant, 
                          y = mhi_2018)
@@ -327,12 +348,24 @@ plot_median_mc_infant <- median_mc_infant |>
 
 ```{r}
 #| label: r-2-2
+#| Lab 4 question 5 
+#| Can you give your column names better titles, so the reader knows what "2008" and "2018" represent? What are the values stored in these columns?
+#| I renamed the column titles so I know what they represent. 
 income_info <- ca_childcare |> 
 filter(study_year %in% c(2008, 2018)
-      ) |>
+) |>
   group_by(region, study_year) |> 
     summarize(median_income = median(mhi_2018, na.rm = TRUE),
-              .groups = "drop") 
+              .groups = "drop") |>
+    pivot_wider(names_from = study_year, 
+                values_from = median_income) |> 
+    arrange(desc('2018')
+) |>
+    select(region, '2008', '2018') |> 
+    rename('Region' = 'region',
+    'Median Income 2008' = '2008',
+    'Median Income 2018' = '2018'
+)
 ```
 
 -   Example of function formatting
@@ -348,11 +381,12 @@ filter(study_year %in% c(2008, 2018)
 
 ```{r}
 #| label: r-3-example
+#| Lab 3 question 6
 teacher_evals_clean |>
-  distinct(teacher_id, .keep_all = TRUE) |>
-  summarize(mean_seniority = mean(seniority, na.rm = TRUE)
-    ) |> 
-    ungroup() 
+summarize(
+  unique_teachers = n_distinct(teacher_id),
+  unique_courses = n_distinct(course_id)
+)
 ```
 
 -   Example (function stops)
@@ -370,6 +404,7 @@ teacher_evals_clean |>
 
 ```{r}
 #| label: dvs-1-num
+#| Lab 4 question 8 
 plot_median_mc_infant <- median_mc_infant |> 
     ggplot(mapping = aes(x = mc_infant, 
                          y = mhi_2018)
@@ -393,15 +428,16 @@ plot_median_mc_infant <- median_mc_infant |>
 
 ```{r}
 #| label: dvs-2-num-cat
+#| 
 untitled_pink <- c("F" = "#e75480",
                   "M" = "#6a5acd") 
 ggplot(surveys, aes(x = sex, y = weight, fill = sex)) + 
     geom_boxplot(outlier.shape = NA) +
     scale_fill_manual(values = untitled_pink) + 
     labs(
-      title = "Relationship between Sex and Weight", 
+      title = "Relationship between Sex and Weight",
       x = "Sex", 
-      y = "Weight (g)") 
+      y = "") 
 ```
 
 -   At least two categorical variables
@@ -744,7 +780,8 @@ ca_childcare |>
 #| label: dvs-4-summarize
 teacher_evals_clean |>
   distinct(teacher_id, .keep_all = TRUE) |>
-  summarize(mean_seniority = mean(seniority, na.rm = TRUE)
+  summarize(
+    mean_seniority = mean(seniority, na.rm = TRUE)
     ) |> 
     ungroup() 
 ```
@@ -780,14 +817,24 @@ teacher_evals_clean <- teacher_evals |>
 
 ```{r}
 #| label: dvs-5-1
-
+teacher_evals_clean |>
+  distinct(teacher_id, .keep_all = TRUE) |>
+  group_by(academic_degree, sex) |>
+  summarise(
+    n_instructors  = n(),
+    mean_seniority = mean(seniority, na.rm = TRUE),
+    .groups = "drop")
 ```
 
 -   Example 2
 
 ```{r}
 #| label: dvs-5-2
-
+teacher_evals_clean |>
+  group_by(teacher_id, course_id) |> 
+  summarize(n_questions = n_distinct(question_no)) |>
+  filter(n_questions == 9) |> 
+  select(teacher_id, course_id)
 ```
 
 **DVS-6: I can create tables which make my summaries clear to the reader.**
@@ -796,7 +843,20 @@ teacher_evals_clean <- teacher_evals |>
 
 ```{r}
 #| label: dvs-6-ex-1
-
+income_info <- ca_childcare |> 
+filter(study_year %in% c(2008, 2018)
+) |>
+  group_by(region, study_year) |> 
+    summarize(median_income = median(mhi_2018, na.rm = TRUE),
+              .groups = "drop") |>
+    pivot_wider(names_from = study_year, 
+                values_from = median_income) |> 
+    arrange(desc('2018')
+) |>
+    select(region, '2008', '2018') |> 
+    rename('Region' = 'region',
+    'Median Income 2008' = '2008',
+    'Median Income 2018' = '2018')
 ```
 
 -   I can modify the text in my table to be more readable (e.g., bold face for column headers)
@@ -810,7 +870,21 @@ teacher_evals_clean <- teacher_evals |>
 
 ```{r}
 #| label: dvs-6-ex-3
-
+income_info <- ca_childcare |> 
+filter(study_year %in% c(2008, 2018)
+) |>
+  group_by(region, study_year) |> 
+    summarize(median_income = median(mhi_2018, na.rm = TRUE),
+              .groups = "drop") |>
+    pivot_wider(names_from = study_year, 
+                values_from = median_income) |> 
+    arrange(desc('2018')
+) |>
+    select(region, '2008', '2018') |> 
+    rename('Region' = 'region',
+    'Median Income 2008' = '2008',
+    'Median Income 2018' = '2018'
+)
 ```
 
 **DVS-7: I show creativity in my tables.**
@@ -844,7 +918,27 @@ teacher_evals_clean <- teacher_evals |>
 
 ```{r}
 #| label: pe-1-across
-
+teacher_evals_clean <- teacher_evals |>
+    rename(sex = gender) |>
+    filter(no_participants >= 10) |>
+    mutate(
+        across(c(teacher_id, 
+                 course_id),                          
+               as.character),
+        across(c(academic_degree, 
+                 sex), 
+               as.factor)
+    ) |>
+    select(course_id,
+           teacher_id,
+           question_no,
+           no_participants,
+           resp_share, 
+           SET_score_avg,
+           percent_failed_cur,
+           academic_degree,
+           seniority,
+           sex)
 ```
 
 -   using functions from the `map()` family
