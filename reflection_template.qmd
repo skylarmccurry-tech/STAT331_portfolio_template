@@ -428,36 +428,31 @@ plot_median_mc_infant <- median_mc_infant |>
 
 ```{r}
 #| label: dvs-2-num-cat
-#| 
-untitled_pink <- c("F" = "#e75480",
-                  "M" = "#6a5acd") 
-ggplot(surveys, aes(x = sex, y = weight, fill = sex)) + 
+#| Challenge 2 
+sex_colors <- c("F" = "#e75480",
+                "M" = "#6a5acd") +
+ggplot(data = surveys,
+      mapping = aes(x = sex, y = weight, color = sex)
+      ) + 
     geom_boxplot(outlier.shape = NA) +
-    scale_fill_manual(values = untitled_pink) + 
+    scale_fill_manual(values = sex_colors) + 
     labs(
-      title = "Relationship between Sex and Weight",
+      title = "Relationship between Sex and Weight (g) in Rodents ", 
+      subtitle = "Y-Axis: Weight (g)",
       x = "Sex", 
-      y = "") 
+      y = "") +
+    theme_bw()
 ```
 
 -   At least two categorical variables
 
 ```{r}
 #| label: dvs-2-cat
-ca_childcare |> 
-    filter(study_year >= 2008, study_year <= 2018) |>
-    group_by(region, study_year) |> 
-    select(region, study_year, mc_infant, mc_toddler, mc_preschool) |> 
-    pivot_longer( 
-                 cols = starts_with("mc_"), 
-                 names_to = "age_group", 
-                 values_to = "median_price") |> 
-    mutate(age_group = case_when(age_group == "mc_infant" ~ "Infant",
-                            age_group == "mc_toddler" ~ "Toddler", 
-                            age_group == "mc_preschool" ~ "Preschool"),
-    age_group = factor(age_group, levels = c("Infant", "Toddler", "Preschool"))
-    ) |>
-    ggplot(mapping = aes(x = study_year, 
+#| Lab 4 question 7 
+#| Can you reorder the facets so they go in the same order as mine?
+#| I reordered the factets to go in a row and list by Infant, Toddler, and Preschooler 
+    
+ggplot(mapping = aes(x = study_year, 
                          y = median_price, 
                          color = fct_reorder2(.f = region, 
                                              .x = study_year, 
@@ -499,20 +494,10 @@ ca_childcare |>
 
 ```{r}
 #| label: dvs-2-date
-ca_childcare |> 
-    filter(study_year >= 2008, study_year <= 2018) |>
-    group_by(region, study_year) |> 
-    select(region, study_year, mc_infant, mc_toddler, mc_preschool) |> 
-    pivot_longer( 
-                 cols = starts_with("mc_"), 
-                 names_to = "age_group", 
-                 values_to = "median_price") |> 
-    mutate(age_group = case_when(age_group == "mc_infant" ~ "Infant",
-                            age_group == "mc_toddler" ~ "Toddler", 
-                            age_group == "mc_preschool" ~ "Preschool"),
-    age_group = factor(age_group, levels = c("Infant", "Toddler", "Preschool"))
-    ) |>
-    ggplot(mapping = aes(x = study_year, 
+#| Lab 4 question 7 
+
+
+ggplot(mapping = aes(x = study_year, 
                          y = median_price, 
                          color = fct_reorder2(.f = region, 
                                              .x = study_year, 
@@ -556,55 +541,20 @@ ca_childcare |>
 
 ```{r}
 #| label: dvs-2-ex-1
-ca_childcare |> 
-    filter(study_year >= 2008, study_year <= 2018) |>
-    group_by(region, study_year) |> 
-    select(region, study_year, mc_infant, mc_toddler, mc_preschool) |> 
-    pivot_longer( 
-                 cols = starts_with("mc_"), 
-                 names_to = "age_group", 
-                 values_to = "median_price") |> 
-    mutate(age_group = case_when(age_group == "mc_infant" ~ "Infant",
-                            age_group == "mc_toddler" ~ "Toddler", 
-                            age_group == "mc_preschool" ~ "Preschool"),
-    age_group = factor(age_group, levels = c("Infant", "Toddler", "Preschool"))
-    ) |>
-    ggplot(mapping = aes(x = study_year, 
-                         y = median_price, 
-                         color = fct_reorder2(.f = region, 
-                                             .x = study_year, 
-                                             .y = median_price))
-           ) + 
-    geom_point(size = 0.2,
-               alpha = 0.9) + 
-    geom_smooth(se = FALSE,
-                linewidth = 0.5, 
-                size = 0.6, 
-                alpha = 0.2) +
-    scale_color_manual(values = rainbow(10)
-    ) +
-    facet_wrap(~ age_group, nrow = 1) + 
-    labs(x = "Study Year", 
-         y = "", 
-         title = "Weekly Median Price for Center-Based Childcare($)", 
-         color = "California Region"
-         ) +
-    theme_bw() + 
-    theme(
-      plot.title = element_text(size = 8),
-      axis.text.x = element_text(size = 5),
-      axis.text.y = element_text(size = 5),
-      axis.title.x = element_text(size = 8),
-      legend.title = element_text(size = 8),
-      legend.text = element_text(size = 7),
-      legend.key.height = unit(.4, "cm"),
-      aspect.ratio = 1) +
-    scale_x_continuous(
-        breaks = seq(2008, 2018, by = 2)
-    ) + 
-  scale_y_continuous(
-    limits = c(100,500),
-    breaks = seq(100, 500, by = 100))
+#| Lab 2 question 16
+#| Switched x for weight because it had less values and y for the different types of rodents so it is easier to read. 
+
+ggplot(data = surveys, 
+  mapping = aes(x = weight, y = species)
+) + 
+geom_boxplot(outlier.shape = NA) +
+geom_point(color = "steelblue", 
+           alpha = 0.5) + 
+labs( 
+  title = "Relathionship between different types of Rodents and Weight", 
+  subtitle = "Y axis: Species of Rodents",
+  x = "Weight (g)", 
+  y = "")
 ```
 
 -   I can modify my colors to be accessible to anyone's eyes
@@ -618,6 +568,7 @@ ca_childcare |>
 
 ```{r}
 #| label: dvs-2-ex-3
+#| Lab 2 question 16
 ggplot(
   data = surveys, 
   mapping = aes(x = weight, y = species)
@@ -636,20 +587,9 @@ labs(
 
 ```{r}
 #| label: dvs-2-ex-4
-ca_childcare |> 
-    filter(study_year >= 2008, study_year <= 2018) |>
-    group_by(region, study_year) |> 
-    select(region, study_year, mc_infant, mc_toddler, mc_preschool) |> 
-    pivot_longer( 
-                 cols = starts_with("mc_"), 
-                 names_to = "age_group", 
-                 values_to = "median_price") |> 
-    mutate(age_group = case_when(age_group == "mc_infant" ~ "Infant",
-                            age_group == "mc_toddler" ~ "Toddler", 
-                            age_group == "mc_preschool" ~ "Preschool"),
-    age_group = factor(age_group, levels = c("Infant", "Toddler", "Preschool"))
-    ) |>
-    ggplot(mapping = aes(x = study_year, 
+#| lab 4 question 7 
+#| I made the chart title bigger and made x and y text smaller, so it is easier to read at first glance. 
+ggplot(mapping = aes(x = study_year, 
                          y = median_price, 
                          color = fct_reorder2(.f = region, 
                                              .x = study_year, 
@@ -691,6 +631,8 @@ ca_childcare |>
 
 ```{r}
 #| label: dvs-2-ex-5
+#| lab 4 question 7 
+#| colors are in order to align with my plot 
 ca_childcare |> 
     filter(study_year >= 2008, study_year <= 2018) |>
     group_by(region, study_year) |> 
@@ -778,6 +720,7 @@ ca_childcare |>
 
 ```{r}
 #| label: dvs-4-summarize
+#| lab 3 question 7 
 teacher_evals_clean |>
   distinct(teacher_id, .keep_all = TRUE) |>
   summarize(
@@ -790,25 +733,7 @@ teacher_evals_clean |>
 
 ```{r}
 #| label: dvs-4-across
-teacher_evals_clean <- teacher_evals |>
-    rename(sex = gender) |>
-    filter(no_participants >= 10) |>
-    mutate(
-        across(c(teacher_id, 
-                course_id),
-                as.character),
-        across(c(academic_degree, sex), as.factor)
-    ) |>
-    select(course_id,
-           teacher_id,
-           question_no,
-           no_participants,
-           resp_share, 
-           SET_score_avg,
-           percent_failed_cur,
-           academic_degree,
-           seniority,
-           sex)
+
 ```
 
 **DVS-5: I can find summaries of variables across multiple groups.**
@@ -817,6 +742,7 @@ teacher_evals_clean <- teacher_evals |>
 
 ```{r}
 #| label: dvs-5-1
+#| Lab 3 question 7 
 teacher_evals_clean |>
   distinct(teacher_id, .keep_all = TRUE) |>
   group_by(academic_degree, sex) |>
@@ -830,6 +756,7 @@ teacher_evals_clean |>
 
 ```{r}
 #| label: dvs-5-2
+#| Lab 3 quesion 9
 teacher_evals_clean |>
   group_by(teacher_id, course_id) |> 
   summarize(n_questions = n_distinct(question_no)) |>
@@ -843,6 +770,8 @@ teacher_evals_clean |>
 
 ```{r}
 #| label: dvs-6-ex-1
+#| lab 4 question 5
+#| Can you give your column names better titles, so the reader knows what "2008" and "2018" represent? What are the values stored in these columns?
 income_info <- ca_childcare |> 
 filter(study_year %in% c(2008, 2018)
 ) |>
@@ -870,6 +799,8 @@ filter(study_year %in% c(2008, 2018)
 
 ```{r}
 #| label: dvs-6-ex-3
+#| lab 4 question 5
+
 income_info <- ca_childcare |> 
 filter(study_year %in% c(2008, 2018)
 ) |>
@@ -918,6 +849,7 @@ filter(study_year %in% c(2008, 2018)
 
 ```{r}
 #| label: pe-1-across
+#| lab 3 question 5 
 teacher_evals_clean <- teacher_evals |>
     rename(sex = gender) |>
     filter(no_participants >= 10) |>
@@ -1007,6 +939,7 @@ teacher_evals_clean <- teacher_evals |>
 
 ```{r}
 #| label: pe-4-2
+#| lab 4 question 7
 ca_childcare |> 
     filter(study_year >= 2008, study_year <= 2018) |>
     group_by(region, study_year) |> 
@@ -1082,6 +1015,9 @@ ca_childcare |>
 
 ```{r}
 #| label: dsm-2-1
+#| lab 4 question 9 
+#| What are x and y in this equation? The context is important to consider!
+#| In the formula reg_mod1 y is prediected by x. 
 reg_mod1 <- lm(mhi_2018 ~ mc_infant, data = median_mc_infant)
 summary(reg_mod1)
 ```
@@ -1090,9 +1026,13 @@ summary(reg_mod1)
 
 ```{r}
 #| label: dsm-2-2
-chisq_table <- table(teacher_evals_compare$set_level, teacher_evals_compare$sen_level)
-chisq_table
-chisq.test(chisq_table)
+#| Challenge 3 question 3 
+#| This works, but did you need to make a contingency table? Could you have input these vectors directly into the chisq.test() function?
+#| I deleted the contingency table and just had chisq.table build the table for me with just x and y. 
+
+chisq.table(teacher_evals_compare$set_level, 
+            teacher_evals_compare$sen_level)
+
 ```
 
 -   Example 3
@@ -1104,15 +1044,21 @@ chisq.test(chisq_table)
 
 ## Revising My Thinking
 
-<!-- How did you revise your thinking throughout the course? How did you revise your thinking on the code examples you have provided in your portfolio? -->
+I revised my thinking in the course by going to office hours, looking back at old labs, and asking table members for help with labs and examples in class. I also redid two labs, Lab 2 and Lab 4, in order to grow and make my code better and meet the expectations of the class. There were definitely some challenges with revising the code, like in plotting Lab 4 Question 7. Even though my graph is not exactly like yours, I think I got pretty close to it and definitely made it better than the one I originally submitted, and I got rid of the warnings in the code too. During the creation of the portfolio, I looked back and revised a lot of my original code from previous labs that I might have missed to make sure it met the expectations clearly.
 
 <!-- For the revisions included in your Portfolio, to help me understand the nature of your revisions, please denote somehow the feedback I provided you (e.g., boldface, italics, colored text) before your revisions. -->
 
 ## Extending My Thinking
 
+I extended my thinking throughout the course by taking what I learned in class and applying it to my graphs. For example, in my original submission for Lab 4 Question 1, I made sure to add theme_bw(), and also included quotation marks when titling the y-axis to ensure a well-formatted graph. Even though it was not required, I remembered to add it to make sure the graph looked professional. I also applied a lot of the feedback and learnings from my peers from previous labs to improve my code.
+
 <!-- How did you extended your thinking throughout the course? How did you extend your thinking on the code examples you have provided in your portfolio? -->
 
 ## Peer Support & Collaboration
+
+I am adding my feedback from Lab 4 to a student in class. I learned how to change the region names in office hours by changing the names to what you want in Question 4 with "".
+
+Hi Fisher! Nice job on Lab 4. You did really good at organizing and breaking up your code to make it easier to read. I also enjoyed reading your descriptions of the data set, very short and straight to the point! I also really liked how you added Infant, Toddler, and Preschool all into one vector using c. I will have to keep that in mind going forward. Overall your code looks great! To make your graph closer to Dr. Theobold, I would suggest in step 4 in as_factor to change the county names to its real names with no abbreviation or underscores to have the California Region key on the right side match to the closer graph. Other than that I think your code looks great. Nice work!
 
 <!-- Include an image or a description of feedback you gave that you are proud of (either in a peer review or in Discord). -->
 
