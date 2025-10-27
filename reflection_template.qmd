@@ -1,6 +1,6 @@
 ---
 title: "STAT 331 Portfolio"
-author: "Skylar McCurry"
+author: "Skylar McCurry!"
 format: html
 editor: visual
 execute:
@@ -14,7 +14,23 @@ code-fold: true
 
 [**My Grade:**]{.underline} I believe my grade equivalent to course work evidenced below to be an C, because I do not think I have made levels of proficiency for the course.
 
-I think I deserve a C in this class because I have made efforts toward the learning objectives WD-5, WD-6, DVS-2, DVS-6, and PE-1 through PE-4. I still need more work with WD-6 and recognizing where to add these in future code assignments. I have made slight progress on WD-5 by being able to use both an inner and left join. I have also made efforts on DVS-2, creating graphs with variables, but I know my graphs still need improvement to reach my full potential. I have made summaries in tables to be clearer to the reader, which I recognized through revisions and by looking back at old lab rubrics. For PE-1, I have made some effort by using across() so my code does not repeat itself. I have not yet made progress on PE-2 or PE-3. In PE-4, I was able to connect a data wrangling pipeline into a ggplot, which I demonstrated in Lab 4. Overall, I think I deserve a C in the class because it took me a while to figure out how to fix warnings and hide tidyverse downloads in Quarto. However, I have learned and grown a lot, which I hope is shown in this portfolio!
+I think I deserve a C in this class because I have made efforts toward the learning objectives WD-5, WD-6, DVS-2, DVS-6, and PE-1 through PE-4.
+
+I still need more work with WD-6 and recognizing where to add these in future code assignments.
+
+I have made slight progress on WD-5 by being able to use both an inner and left join.
+
+I have also made efforts on DVS-2, creating graphs with variables, but I know my graphs still need improvement to reach my full potential.
+
+I have made summaries in tables to be clearer to the reader, which I recognized through revisions and by looking back at old lab rubrics.
+
+For PE-1, I have made some effort by using across() so my code does not repeat itself.
+
+I have not yet made progress on PE-2 or PE-3. In PE-4, I was able to connect a data wrangling pipeline into a ggplot, which I demonstrated in Lab 4.
+
+Overall, I think I deserve a C in the class because it took me a while to figure out how to fix warnings and hide tidyverse downloads in Quarto.
+
+However, I have learned and grown a lot, which I hope is shown in this portfolio!
 
 [**Learning Objective Evidence:**]{.underline} In the code chunks below, provide code from Lab or Challenge assignments where you believe you have demonstrated proficiency with the specified learning target. Be sure to specify **where** the code came from (e.g., Lab 4 Question 2).
 
