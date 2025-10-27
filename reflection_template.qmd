@@ -1,23 +1,20 @@
 ---
 title: "STAT 331 Portfolio"
 author: "Skylar McCurry"
-format: html 
-embed-resources: true
-layout: margin-left
+format: html
 editor: visual
-execute: 
+execute:
   eval: false
-  echo: true
-embed-resources: true
-code-tools: true
-code-fold: true
-execute: 
   echo: true
   warning: false
   message: false
+code-tools: true
+code-fold: true
 ---
 
-[**My Grade:**]{.underline} I believe my grade equivalent to course work evidenced below to be an \_\_.
+[**My Grade:**]{.underline} I believe my grade equivalent to course work evidenced below to be an C, because I do not think I have made levels of proficiency for the course.
+
+I think I deserve a C in this class because I have made efforts toward the learning objectives WD-5, WD-6, DVS-2, DVS-6, and PE-1 through PE-4. I still need more work with WD-6 and recognizing where to add these in future code assignments. I have made slight progress on WD-5 by being able to use both an inner and left join. I have also made efforts on DVS-2, creating graphs with variables, but I know my graphs still need improvement to reach my full potential. I have made summaries in tables to be clearer to the reader, which I recognized through revisions and by looking back at old lab rubrics. For PE-1, I have made some effort by using across() so my code does not repeat itself. I have not yet made progress on PE-2 or PE-3. In PE-4, I was able to connect a data wrangling pipeline into a ggplot, which I demonstrated in Lab 4. Overall, I think I deserve a C in the class because it took me a while to figure out how to fix warnings and hide tidyverse downloads in Quarto. However, I have learned and grown a lot, which I hope is shown in this portfolio!
 
 [**Learning Objective Evidence:**]{.underline} In the code chunks below, provide code from Lab or Challenge assignments where you believe you have demonstrated proficiency with the specified learning target. Be sure to specify **where** the code came from (e.g., Lab 4 Question 2).
 
@@ -1046,13 +1043,9 @@ chisq.table(teacher_evals_compare$set_level,
 
 I revised my thinking in the course by going to office hours, looking back at old labs, and asking table members for help with labs and examples in class. I also redid two labs, Lab 2 and Lab 4, in order to grow and make my code better and meet the expectations of the class. There were definitely some challenges with revising the code, like in plotting Lab 4 Question 7. Even though my graph is not exactly like yours, I think I got pretty close to it and definitely made it better than the one I originally submitted, and I got rid of the warnings in the code too. During the creation of the portfolio, I looked back and revised a lot of my original code from previous labs that I might have missed to make sure it met the expectations clearly.
 
-<!-- For the revisions included in your Portfolio, to help me understand the nature of your revisions, please denote somehow the feedback I provided you (e.g., boldface, italics, colored text) before your revisions. -->
-
 ## Extending My Thinking
 
 I extended my thinking throughout the course by taking what I learned in class and applying it to my graphs. For example, in my original submission for Lab 4 Question 1, I made sure to add theme_bw(), and also included quotation marks when titling the y-axis to ensure a well-formatted graph. Even though it was not required, I remembered to add it to make sure the graph looked professional. I also applied a lot of the feedback and learnings from my peers from previous labs to improve my code.
-
-<!-- How did you extended your thinking throughout the course? How did you extend your thinking on the code examples you have provided in your portfolio? -->
 
 ## Peer Support & Collaboration
 
@@ -1060,6 +1053,4 @@ I am adding my feedback from Lab 4 to a student in class. I learned how to chang
 
 Hi Fisher! Nice job on Lab 4. You did really good at organizing and breaking up your code to make it easier to read. I also enjoyed reading your descriptions of the data set, very short and straight to the point! I also really liked how you added Infant, Toddler, and Preschool all into one vector using c. I will have to keep that in mind going forward. Overall your code looks great! To make your graph closer to Dr. Theobold, I would suggest in step 4 in as_factor to change the county names to its real names with no abbreviation or underscores to have the California Region key on the right side match to the closer graph. Other than that I think your code looks great. Nice work!
 
-<!-- Include an image or a description of feedback you gave that you are proud of (either in a peer review or in Discord). -->
-
-<!-- Include a description of how you grew as a collaborator through the weekly pair programming activities.   -->
+I made sure to tell the student what I had learned in office hours to collaborate and help other students with the labs.
