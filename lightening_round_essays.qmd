@@ -6,16 +6,22 @@ editor: visual
 
 **Answer each of the following questions with *one sentence* including a brief explanation.**
 
-1. Finish the sentence with another student’s name: "If [Name of Student] doesn’t earn an A, then nobody should, because..." Explain your choice and your reasoning.
+1.  Finish the sentence with another student’s name: "If \[Name of Student\] doesn’t earn an A, then nobody should, because..." Explain your choice and your reasoning.
 
+If Sam doesn’t earn an A, then no one should, because I was partners with him during the jewel heist, and he was very knowledgeable about the topics we learned in class. He helped me understand the material by explaining it clearly instead of just giving me the answers.
 
-2. What was the most difficult part of the class for you? List a general topic, a specific problem, a kind of work we did, etc. and explain why.
+2.  What was the most difficult part of the class for you? List a general topic, a specific problem, a kind of work we did, etc. and explain why.
 
+The most difficult part of the class for me was combining everything I learned from previous weeks and applying it to the new material each week.
 
-3. What was the easiest part of the class for you? Explain why.
+3.  What was the easiest part of the class for you? Explain why.
 
+The easiest part of the class for me was the early stages of using ggplot, where we only had to import the data, choose a graph style, select colors, and add titles.
 
-4. What part of the class surprised or interested you the most? Explain why.
+4.  What part of the class surprised or interested you the most? Explain why.
 
+The part of the class that surprised me the most was realizing that I could combine complex code from previous lessons and build on it to create even more advanced work.
 
-5. Give one piece of advice to a student just beginning a quarter of STAT 331 that will help them be successful in learning.
+5.  Give one piece of advice to a student just beginning a quarter of STAT 331 that will help them be successful in learning.
+
+I definitely recommend going back and practicing the code or topics you don’t fully understand, so you can execute them perfectly in future labs.
