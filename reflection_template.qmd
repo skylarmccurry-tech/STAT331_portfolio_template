@@ -3,7 +3,6 @@ title: "STAT 331 Portfolio"
 author: "Skylar McCurry!"
 format: html
 editor: visual
-embed-resources: true
 execute:
   eval: false
   echo: true
@@ -11,6 +10,7 @@ execute:
   message: false
 code-tools: true
 code-fold: true
+embed-resources: true
 ---
 
 [**My Grade:**]{.underline} I believe my grade equivalent to course work evidenced below to be an C, because I do not think I have made levels of proficiency for the course.
@@ -217,7 +217,7 @@ drivers_license_1 <- drivers_license |>
 ```{r}
 #| label: wd-3-date
 # lab 5 
-# using ymd to put date in correct object
+# using ymd to put date in correct object, revised for portfolio 
 crime_scene_report_three <- crime_scene_report |>
 mutate(date = ymd(date)
 ) |> 
@@ -416,7 +416,8 @@ label <- rlang::englue("A scatterplot of { label_x } and { label_y } between { l
 df |> 
 ggplot(aes(x = {{ x_var }}, 
             y = {{ y_var }}, 
-            color = {{ color_var }})
+            color = {{ color_var }
+              })
        ) + 
 geom_point(alpha = 0.4) +
 geom_smooth(method = "lm", se = FALSE, alpha = 0.6) + 
@@ -434,7 +435,18 @@ geom_smooth(method = "lm", se = FALSE, alpha = 0.6) +
 
 ```{r}
 #| label: wd-4-date
-
+# lab 5 
+crime_scene_report_three <- crime_scene_report |>
+mutate(date = ymd(date)
+) |> 
+filter(type == "murder", 
+      city == "SQL City", 
+      date == ymd("20180115")
+      ) |> 
+  select(date, 
+          type, 
+          city, 
+          description) 
 ```
 
 **WD-5: I can use mutating joins to combine multiple dataframes.**
@@ -567,9 +579,9 @@ df |>
   mutate(across(everything(), as.character)
          ) |>
   pivot_longer(
-  cols = everything(), 
-  names_to = "variable", 
-  values_to = "level"
+              cols = everything(), 
+              names_to = "variable", 
+              values_to = "level"
   ) |> 
 count(variable, level, name = "n") |> 
 group_by(variable) |> 
@@ -628,11 +640,11 @@ filter(study_year %in% c(2008, 2018)
 
 The following assignments satisfy the above criteria:
 
--   example 1
+-   Lab 9
 
--   example 2
+-   Challenge 3
 
--   example 3
+-   Lab 3
 
 -   example 4
 
@@ -651,7 +663,7 @@ plot_median_mc_infant <- median_mc_infant |>
                          y = mhi_2018)
     ) +
     geom_point(alpha = 0.2) + 
-    geom_smooth(method = "lm", se = FALSE, color = "darkblue")+ 
+    geom_smooth(method = "lm", se = FALSE, color = "darkblue") + 
     theme_bw() +
     labs(x = "Infant Cost for Center Based Child Care", 
          y = "",
@@ -722,7 +734,8 @@ if (!is.data.frame(df)) {
     stop("Input `df` must be a data frame.")
   }
 df |> 
-count({{ row_var }}, {{ col_var }}) |> 
+count({{ row_var }}, {{ col_var }}
+      ) |> 
 pivot_wider (
 names_from = {{ col_var }}, 
 values_from = n, 
@@ -786,7 +799,8 @@ label <- rlang::englue("A scatterplot of { label_x } and { label_y } between { l
 df |> 
 ggplot(aes(x = {{ x_var }}, 
             y = {{ y_var }}, 
-            color = {{ color_var }})) + 
+            color = {{ color_var }})
+       ) + 
 geom_point(alpha = 0.4) +
 geom_smooth(method = "lm", se = FALSE, alpha = 0.6) + 
     labs(
@@ -1145,7 +1159,8 @@ labs(x = "Number of Babies Given to Right Family",
 #| label: dvs-3-3
 # Lab 10 Question 13
 ci_df |> 
-mutate(sim = row_number()) |> 
+mutate(sim = row_number()
+       ) |> 
 slice_head(n = 100) |>
 
 ggplot(aes(
@@ -1546,7 +1561,8 @@ seniority = factor(
 summarize_table <- function(df, ...) {
 df |> 
   select(...) |> 
-  mutate(across(everything(), as.character)) |>
+  mutate(across(everything(), as.character)
+         ) |>
   pivot_longer(
   cols = everything(), 
   names_to = "variable", 
@@ -1554,7 +1570,8 @@ df |>
   ) |> 
 count(variable, level, name = "n") |> 
 group_by(variable) |> 
-mutate(prop = n / sum(n)) |> 
+mutate(prop = n / sum(n)
+       ) |> 
 ungroup() |> 
     mutate(
       across(
@@ -1585,7 +1602,8 @@ summary_tbl
 #| label: pe-3-map-1
 # lab 9 question 7 
 fish |> 
-  map_int(.f = ~ sum(is.na(.x))) |> 
+  map_int(.f = ~ sum(is.na(.x))
+          ) |> 
   enframe(name = "variable", value = "n_missing") |> 
   arrange(n_missing) |> 
 gt () |> 
@@ -1768,9 +1786,13 @@ summary(species_mod)
 
 I revised my thinking in the course by going to office hours, looking back at old labs, and asking table members for help with labs and examples in class. I also redid two labs, Lab 2 and Lab 4, in order to grow and make my code better and meet the expectations of the class. There were definitely some challenges with revising the code, like in plotting Lab 4 Question 7. Even though my graph is not exactly like yours, I think I got pretty close to it and definitely made it better than the one I originally submitted, and I got rid of the warnings in the code too. During the creation of the portfolio, I looked back and revised a lot of my original code from previous labs that I might have missed to make sure it met the expectations clearly.
 
+I revised my thinking after the midterm by looking through my midterm rubric, editing code after given feedback, redoing labs from before the midterm in order to fill holes in my portfolio, and going to office hours. Leading up to the final portfolio I was looking through old labs specifically lab 3-5. I had many holes to fill in my learnings/portfolio after the midterm. So I made sure to start editing/revising those missing holes. I made sure to redo lab 5 because I was missing a lot of WD-5 and WD-6. So I made sure to redo the lab, and look over rubric comments in order to make critical changes. When labs were due I made sure to go to office hours and ask questions in class in order to ask clarifying questions and add essential code chunks to make my code preform better. Overall I think I grew a lot from my coding knowledge and effort from after the midterm.
+
 ## Extending My Thinking
 
 I extended my thinking throughout the course by taking what I learned in class and applying it to my graphs. For example, in my original submission for Lab 4 Question 1, I made sure to add theme_bw(), and also included quotation marks when titling the y-axis to ensure a well-formatted graph. Even though it was not required, I remembered to add it to make sure the graph looked professional. I also applied a lot of the feedback and learnings from my peers from previous labs to improve my code.
+
+After the midterm I extended my thinking by feeling confident to add in new colors to plots and tables. I also researched how to make tables look better using gt(). I am very proud of a column plot I have from lab 10 question 4. I added non-default colors, and had the sample sizes in the legend to change it up a little bit.
 
 ## Peer Support & Collaboration
 
