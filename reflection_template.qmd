@@ -42,14 +42,17 @@ However, I have learned and grown a lot, which I hope is shown in this portfolio
 
 ```{r}
 #| label: wd-1-csv-1
-teacher_evals <- read_csv(here::here("Week 3", "teacher_evals.csv"))
+teacher_evals <- read_csv(here::here("Week 3", 
+                                     "teacher_evals.csv"))
 ```
 
 -   `csv` Example 2
 
 ```{r}
 #| label: wd-1-csv-2
-surveys <- read.csv(here::here("surveys.csv"))
+fish <- read_csv(here::here("Week 7", 
+                            "BlackfootFish.csv"))
+                              
 
 ```
 
@@ -57,7 +60,13 @@ surveys <- read.csv(here::here("surveys.csv"))
 
 ```{r}
 #| label: wd-1-xlsx
-
+# Practice Activity 4 question 1
+military <- read_xlsx("gov_spending_per_capita.xlsx",
+                      sheet = "Share of Govt. spending",
+                      skip  = 7,
+                      n_max = 191,
+                      na = c(". .", "xxx", "..")
+                      )
 ```
 
 **WD-2: I can select necessary columns from a dataset.**
@@ -66,7 +75,7 @@ surveys <- read.csv(here::here("surveys.csv"))
 
 ```{r}
 #| label: wd-2-ex-1
-#| Lab 4 question 5 
+# Lab 4 question 5 
 income_info <- ca_childcare |> 
 filter(study_year %in% c(2008, 2018)
 ) |>
@@ -87,6 +96,39 @@ filter(study_year %in% c(2008, 2018)
 
 ```{r}
 #| label: wd-2-ex-2
+# Lab 10 Question 8 
+mycifun <- function(beta0, beta1, n){
+
+x <- runif(n = n, 
+      max = 1, 
+      min = 0) 
+
+ep <- rnorm(n = n, 
+            mean = 0, 
+            sd = 1)
+
+y = beta0 + beta1 * x + ep
+
+data = tibble(x = x, 
+              y = y 
+) 
+linear_regression <- lm(y ~ x, data = data) 
+
+ broom::tidy(linear_regression, 
+            conf.int = TRUE,
+            conf.level = 0.95) |>
+   filter(term == "x") |> 
+mutate(
+    cover = if_else(
+      term == "x" & beta1 >= conf.low & beta1 <= conf.high,
+      1,
+      0
+    ) 
+  ) |> 
+     select(-c(std.error, p.value, statistic, term)
+            ) |> 
+   rename(slope_estimate = estimate)
+}
 
 ```
 
@@ -94,7 +136,13 @@ filter(study_year %in% c(2008, 2018)
 
 ```{r}
 #| label: wd-2-ex-3
-
+# Lab 3 Question 9
+teacher_evals_clean |>
+  group_by(teacher_id, course_id) |> 
+  summarize(n_questions = n_distinct(question_no)
+            ) |>
+  filter(n_questions == 9) |> 
+  select(ends_with("_id"))
 ```
 
 **WD-3: I can filter rows from a dataframe for a *variety* of data types (e.g., numeric, integer, character, factor, date).**
@@ -103,9 +151,9 @@ filter(study_year %in% c(2008, 2018)
 
 ```{r}
 #| label: wd-3-numeric-ex-1
-#| lab 4 question 6
-#| Is there a function that allows you to slice the min of a specific variable?
-#| I used slice_min to automatically get me the lowest median charge for center based childcare for infants in a specfic region. 
+# lab 4 question 6
+# Is there a function that allows you to slice the min of a specific variable?
+# I used slice_min to automatically get me the lowest median charge for center based childcare for infants in a specfic region. 
 
 ca_childcare |> 
 group_by(region) |>
@@ -117,10 +165,10 @@ slice_min(mc_infant)
 -   Numeric Example 2
 
 ```{r}
-#| label: wd-3-numeric-ex-1
-#| lab 4 question 5
-#| I would highly recommend filtering first, so you are summarizing a smaller dataset.
-#| In my revisons I filtered by 2008 and 2018 first so I could be working with a smaller dataset and have less room for error. 
+#| label: wd-3-numeric-ex-2
+# lab 4 question 5
+# I would highly recommend filtering first, so you are summarizing a smaller dataset.
+# In my revisons I filtered by 2008 and 2018 first so I could be working with a smaller dataset and have less room for error. 
 income_info <- ca_childcare |> 
 filter(study_year %in% c(2008, 2018)
 ) |>
@@ -142,27 +190,41 @@ filter(study_year %in% c(2008, 2018)
 
 ```{r}
 #| label: wd-3-character
-#| lab 5 
-drivers_license_1 <- drivers_license |> 
-    filter(gender == "male",
-            str_detect(plate_number, "H42W")) 
+# lab 5 
+person_suspect <- person |> 
+filter(license_id %in% c("423327", "664760")
+) 
+get_fit_now_murder <- get_fit_now_member |> 
+    filter(name %in% c("Tushar Chandra", "Jeremy Bowers")) 
 ```
 
 -   Character Example 2 (example must use functions from **stringr**)
 
 ```{r}
 #| label: wd-3-string
-#| lab 5 
-person_annabel <- person |> 
-    filter(str_detect(name, regex("^Annabel", ignore_case = TRUE)), 
-            address_street_name == "Franklin Ave") 
+# lab 5 
+drivers_license_1 <- drivers_license |> 
+    filter(gender == "male",
+            str_detect(plate_number, "H42W"))
 ```
 
 -   Date (example must use functions from **lubridate**)
 
 ```{r}
 #| label: wd-3-date
-
+# lab 5 
+# using ymd to put date in correct object
+crime_scene_report_three <- crime_scene_report |>
+mutate(date = ymd(date)
+) |> 
+filter(type == "murder", 
+      city == "SQL City", 
+      date == ymd("20180115")
+      ) |> 
+  select(date, 
+          type, 
+          city, 
+          description) 
 ```
 
 **WD-4: I can modify existing variables and create new variables in a dataframe for a *variety* of data types (e.g., numeric, integer, character, factor, date).**
@@ -171,50 +233,191 @@ person_annabel <- person |>
 
 ```{r}
 #| label: wd-4-numeric-ex-1
-
+# Lab 9 Question 5 
+evals <- evals|> 
+mutate(
+  seniority_num = as.numeric(seniority),
+  seniority = case_when(
+          seniority <= 4 ~ "Junior", 
+          seniority > 4 & seniority <= 8 ~ "Senior", 
+          seniority > 8 ~ "Super senior", 
+          TRUE ~ NA_character_
+), 
+seniority = factor(
+      seniority,
+      levels = c("Junior", "Senior", "Super senior")
+    ) )
+summarize_table <- function(df, ...) {
+df |> 
+  select(...) |> 
+  mutate(across(everything(), as.character)) |>
+  pivot_longer(
+  cols = everything(), 
+  names_to = "variable", 
+  values_to = "level"
+  ) |> 
+count(variable, level, name = "n") |> 
+group_by(variable) |> 
+mutate(prop = n / sum(n)) |> 
+ungroup() |> 
+    mutate(
+      variable = variable |> 
+        str_replace_all( pattern = "_", 
+                        replacement = " ") |> 
+         str_to_title (), 
+       level = level |> 
+    str_replace_all( pattern = "_", 
+                        replacement = " ")   |>
+    str_to_title () ) |> 
+gt () |> 
+tab_style(
+    style = cell_text(weight = "bold"), 
+    locations = cells_column_labels(everything())
+  ) 
+}
+summary_tbl <- summarize_table(evals,
+  academic_degree,
+  seniority,
+  sex
+)
+summary_tbl
 ```
 
 -   Numeric Example 2
 
 ```{r}
 #| label: wd-4-numeric-ex-2
+# lab 10 Question 2 
+results_df <- enframe(results, 
+              name = "variable", 
+              value = "right_family") |> 
+count(right_family, name = "n") |> 
+mutate(prop = n/ sum(n))
 
+results_df |> 
+  gt() |> 
+  fmt_percent(columns = prop) |> 
+  cols_label(
+    right_family = "Right Family", 
+    n = "Count", 
+    prop = "Proportion"
+  ) |> 
+tab_header(
+title = "Number of Babies given to the Right Families", 
+subtitle = "Out of 10,000")
 ```
 
 -   Factor Example 1 (renaming levels)
 
 ```{r}
 #| label: wd-4-factor-ex-1
-
+# Lab 4 Question 7 
+ca_childcare |> 
+    filter(study_year >= 2008, study_year <= 2018) |>
+    group_by(region, study_year) |> 
+    summarize(
+        mc_infant = median(mc_infant, na.rm = TRUE),
+        mc_toddler = median(mc_toddler, na.rm = TRUE),
+        mc_preschool = median(mc_preschool, na.rm = TRUE),
+        .groups = "drop")|> 
+    pivot_longer( 
+                 cols = starts_with("mc_"), 
+                 names_to = "age_group", 
+                 values_to = "median_price") |> 
+    mutate(
+      age_group = case_when(age_group == "mc_infant" ~ "Infant",
+                            age_group == "mc_toddler" ~ "Toddler", 
+                            age_group == "mc_preschool" ~ "Preschool")
+    )
 ```
 
 -   Factor Example 2 (reordering levels)
 
 ```{r}
 #| label: wd-4-factor-ex-2
-
+# lab 9 question 5
+evals <- evals|> 
+mutate(
+  seniority_num = as.numeric(seniority),
+  seniority = case_when(
+          seniority <= 4 ~ "Junior", 
+          seniority > 4 & seniority <= 8 ~ "Senior", 
+          seniority > 8 ~ "Super senior", 
+          TRUE ~ NA_character_
+), 
+seniority = factor(
+      seniority,
+      levels = c("Junior", "Senior", "Super senior")
+    ) )
+summarize_table <- function(df, ...) {
+df |> 
+  select(...) |> 
+  mutate(across(everything(), as.character)) |>
+  pivot_longer(
+  cols = everything(), 
+  names_to = "variable", 
+  values_to = "level"
+  ) |> 
+count(variable, level, name = "n") |> 
+group_by(variable) |> 
+mutate(prop = n / sum(n)) |> 
+ungroup() |> 
+    mutate(
+      variable = variable |> 
+        str_replace_all( pattern = "_", 
+                        replacement = " ") |> 
+         str_to_title (), 
+       level = level |> 
+    str_replace_all( pattern = "_", 
+                        replacement = " ")   |>
+    str_to_title () ) |> 
+gt () |> 
+tab_style(
+    style = cell_text(weight = "bold"), 
+    locations = cells_column_labels(everything())
+  ) 
+}
+summary_tbl <- summarize_table(evals,
+  academic_degree,
+  seniority,
+  sex
+)
+summary_tbl
 ```
 
 -   Character (example must use functions from **stringr**)
 
 ```{r}
 #| label: wd-4-string
-#| lab 5 
-crime_scene_report_three <- crime_scene_report |>
-filter(type == "murder", 
-      city == "SQL City", 
-      date == "20180115") |> 
-    select(date, 
-            type, 
-            city, 
-            description) 
-    person_three <- person |> 
-    filter(address_street_name == "Northwestern Dr") |> 
-    arrange(desc(address_number)) 
-    person_annabel <- person |> 
-    filter(
-        str_detect(name, regex("^Annabel", ignore_case = TRUE)), 
-        address_street_name == "Franklin Ave") 
+# lab 8 question 3
+clean_label <- function(x) {
+x |> 
+str_replace_all(pattern = "_", 
+                replacement = " ") |> 
+                str_to_title()
+}
+scatterplot <- function(df, x_var, y_var, color_var) {
+  
+label_x <- clean_label(rlang::englue("{{ x_var }}"))  
+label_y <- clean_label(rlang::englue("{{ y_var }}"))  
+label_color <- clean_label(rlang::englue("{{ color_var }}"))
+label <- rlang::englue("A scatterplot of { label_x } and { label_y } between { label_color }")
+
+df |> 
+ggplot(aes(x = {{ x_var }}, 
+            y = {{ y_var }}, 
+            color = {{ color_var }})
+       ) + 
+geom_point(alpha = 0.4) +
+geom_smooth(method = "lm", se = FALSE, alpha = 0.6) + 
+    labs(
+    title = label,
+         subtitle = label_y, 
+        y = "", 
+        x = label_x) + 
+    theme_bw()
+}
+
 ```
 
 -   Date (example must use functions from **lubridate**)
@@ -230,34 +433,47 @@ filter(type == "murder",
 
 ```{r}
 #| label: wd-5-left-ex-1
-#| lab 4 question 3 
+# lab 4 question 3 
 ca_childcare <- left_join(x = ca_childcare, 
                           y = tax_rev, 
-                          by = join_by(county_name == entity_name, study_year == year))
+                          by = join_by(county_name == entity_name, 
+                                       study_year == year)
+                          )
 ```
 
 -   `right_join()` Example 1
 
 ```{r}
 #| label: wd-5-right
-
+# lab 5 
+# Changed to using right join rather than filtering because then I did not have to use so many mannual IDs. Revised to put in portfolio
+get_fit_now_murder <- get_fit_now_member |> 
+  right_join(
+    get_fit_now_check_in_1, 
+    by = c("id" = "membership_id")
+    )
 ```
 
 -   `left_join()` **or** `right_join()` Example 2
 
 ```{r}
 #| label: wd-5-left-right-ex-2
-
+# lab 5 
+# Changed to using right join rather than filtering because then I did not have to use so many mannual IDs. Revised to put in portfolio
+interview_a_m <- interview |> 
+    right_join(interview, 
+               by = c("id" = "person_id")
+) 
 ```
 
 -   `inner_join()` Example 1
 
 ```{r}
 #| label: wd-5-inner-ex-1
-#| lab 4 question 2
-#| Do you want to keep EVERYTHING in both datasets?
-#| Your code doesn’t specify how these two datsets should be joined, so you are relying on R recognizing the names of the columns that are the same between the two datasets. I would strongly recommend telling R exactly how you want the data to be joined—this code is more resistant to changes in the data.
-#| I used an inner join, because I want to compare results from different counties. 
+# lab 4 question 2
+# Do you want to keep EVERYTHING in both datasets?
+# Your code doesn’t specify how these two datsets should be joined, so you are relying on R recognizing the names of the columns that are the same between the two datasets. I would strongly recommend telling R exactly how you want the data to be joined—this code is more resistant to changes in the data.
+# I used an inner join, because I want to compare results from different counties. 
 ca_childcare <- inner_join(x = counties, 
                           y = childcare_costs, 
                           by = join_by(county_fips_code == county_fips_code)
@@ -269,7 +485,17 @@ ca_childcare <- inner_join(x = counties,
 
 ```{r}
 #| label: wd-5-inner-ex-2
-
+# lab 5 
+# I changed my orginal code to inner_join because it was fewer steps than filtering between two different data sets. Revised to put in portfolio
+filter(
+        hair_color == "red", 
+        gender == "female", 
+        car_make == "Tesla", 
+        car_model == "Model S", 
+        height >= 65, 
+        height <= 67) 
+suspect <- drivers_license_real |> 
+  inner_join(person, by = c("id" = "license_id"))
 ```
 
 **WD-6: I can use filtering joins to filter rows from a dataframe.**
@@ -278,14 +504,31 @@ ca_childcare <- inner_join(x = counties,
 
 ```{r}
 #| label: wd-6-semi
-
+# lab 5 
+# I changed filter to semi join so it would drop all numbers that do not have a match, and it is easier than filtering specific numbers. Revised to put in portfolio
+drivers_license_1 <- drivers_license |> 
+    filter(
+        gender == "male",
+        str_detect(plate_number, "H42W")
+    ) 
+person_suspect <- person |> 
+ semi_join(
+   drivers_license_1, 
+   by = c("license_id" = "id")
+ )
 ```
 
 -   `anti_join()`
 
 ```{r}
 #| label: wd-6-anti
-
+# Lab 5 
+# I used anti_join to show me people who never showed up at the checkin, revised to put in portfolio
+suspects_no_event <- suspect |> 
+  anti_join(
+    facebook_event_checkin, 
+    by = c("id" = "person_id")
+  )
 ```
 
 **WD-7: I can pivot dataframes from long to wide and visa versa**
@@ -294,14 +537,64 @@ ca_childcare <- inner_join(x = counties,
 
 ```{r}
 #| label: wd-7-long
-
+# Lab 9 Question 5
+evals <- evals|> 
+mutate(
+  seniority_num = as.numeric(seniority),
+  seniority = case_when(
+          seniority <= 4 ~ "Junior", 
+          seniority > 4 & seniority <= 8 ~ "Senior", 
+          seniority > 8 ~ "Super senior", 
+          TRUE ~ NA_character_
+), 
+seniority = factor(
+      seniority,
+      levels = c("Junior", "Senior", "Super senior")
+    ) )
+summarize_table <- function(df, ...) {
+df |> 
+  select(...) |> 
+  mutate(across(everything(), as.character)
+         ) |>
+  pivot_longer(
+  cols = everything(), 
+  names_to = "variable", 
+  values_to = "level"
+  ) |> 
+count(variable, level, name = "n") |> 
+group_by(variable) |> 
+mutate(prop = n / sum(n)
+       ) |> 
+ungroup() |> 
+    mutate(
+      variable = variable |> 
+        str_replace_all( pattern = "_", 
+                        replacement = " ") |> 
+        str_to_title (), 
+       level = level |> 
+    str_replace_all( pattern = "_", 
+                        replacement = " ")   |>
+    str_to_title () 
+    ) |> 
+gt () |> 
+tab_style(
+    style = cell_text(weight = "bold"), 
+    locations = cells_column_labels(everything())
+  ) 
+}
+summary_tbl <- summarize_table(evals,
+  academic_degree,
+  seniority,
+  sex
+)
+summary_tbl
 ```
 
 -   `pivot_wider()`
 
 ```{r}
 #| label: wd-7-wide
-#| lab 4 question 5
+# lab 4 question 5
 income_info <- ca_childcare |> 
 filter(study_year %in% c(2008, 2018)
 ) |>
@@ -325,11 +618,15 @@ filter(study_year %in% c(2008, 2018)
 
 The following assignments satisfy the above criteria:
 
--   Example 1
--   Example 2
--   Example 3
--   Example 4
--   Example 5
+-   example 1
+
+-   example 2
+
+-   example 3
+
+-   example 4
+
+-   example 5
 
 **R-2: I can write well documented and tidy code.**
 
@@ -337,7 +634,6 @@ The following assignments satisfy the above criteria:
 
 ```{r}
 #| label: r-2-1
-#| lab 4 question 8 
 plot_median_mc_infant <- median_mc_infant |> 
     ggplot(mapping = aes(x = mc_infant, 
                          y = mhi_2018)
@@ -349,7 +645,7 @@ plot_median_mc_infant <- median_mc_infant |>
          y = "",
          title = "Relationship between median household income and full-time median weekly price for center-based childcare for an infant in California in 2018 ($)"
     ) +
-    scale_x_continuous(
+    sale_x_continuous(
         labels = scales::label_dollar()
     ) + 
     scale_y_continuous(
@@ -361,9 +657,9 @@ plot_median_mc_infant <- median_mc_infant |>
 
 ```{r}
 #| label: r-2-2
-#| Lab 4 question 5 
-#| Can you give your column names better titles, so the reader knows what "2008" and "2018" represent? What are the values stored in these columns?
-#| I renamed the column titles so I know what they represent. 
+# Lab 4 question 5 
+# Can you give your column names better titles, so the reader knows what "2008" and "2018" represent? What are the values stored in these columns?
+# I renamed the column titles so I know what they represent. 
 income_info <- ca_childcare |> 
 filter(study_year %in% c(2008, 2018)
 ) |>
@@ -385,7 +681,18 @@ filter(study_year %in% c(2008, 2018)
 
 ```{r}
 #| label: r-2-3
+# lab 7 question 4 
+rescale_01 <- function(vec){
+if(!is.numeric(vec)) {
+ stop("Argument input for vec is not numeric")
+} 
+if(length(vec) <= 1) {
+stop("Argument input is not greater than one")
+}
+  rng <- range(vec, na.rm = TRUE) 
+  (vec - rng[1]) / (rng[2] - rng[1])
 
+}
 ```
 
 **R-3: I can write robust programs that are resistant to changes in inputs.**
@@ -394,19 +701,42 @@ filter(study_year %in% c(2008, 2018)
 
 ```{r}
 #| label: r-3-example
-#| Lab 3 question 6
-teacher_evals_clean |>
-summarize(
-  unique_teachers = n_distinct(teacher_id),
-  unique_courses = n_distinct(course_id)
-)
+# Lab 8 Question 2 
+# What is the missing argument doing???
+# Input checks for data frame functions are tricky, but an easy one is to check if the data frame being input is actually a data frame (not a vector or a matrix).
+# I deleted the missing from function argument and then I also added !is.data.frame to make sure the function only accepts a data frame. 
+count_wide <- function(df, row_var, col_var) {
+if (!is.data.frame(df)) {
+    stop("Input `df` must be a data frame.")
+  }
+df |> 
+count({{ row_var }}, {{ col_var }}) |> 
+pivot_wider (
+names_from = {{ col_var }}, 
+values_from = n, 
+values_fill = 0
+) |> 
+janitor::adorn_totals(where = c("row", "col"))
+}
 ```
 
 -   Example (function stops)
 
 ```{r}
 #| label: r-3-function-stops
+# lab 7 question 4 
+rescale_01 <- function(vec){
+if(!is.numeric(vec)
+   ) {
+ stop("Argument input for vec is not numeric")
+} 
+if(length(vec) <= 1) {
+stop("Argument input is not greater than one")
+}
+  rng <- range(vec, na.rm = TRUE) 
+  (vec - rng[1]) / (rng[2] - rng[1])
 
+}
 ```
 
 ## Data Visualization & Summarization
@@ -417,31 +747,51 @@ summarize(
 
 ```{r}
 #| label: dvs-1-num
-#| Lab 4 question 8 
-plot_median_mc_infant <- median_mc_infant |> 
-    ggplot(mapping = aes(x = mc_infant, 
-                         y = mhi_2018)
-    ) +
-    geom_point(alpha = 0.2) + 
-    geom_smooth(method = "lm", se = FALSE, color = "darkblue")+ 
-    theme_bw() +
-    labs(x = "Infant Cost for Center Based Child Care", 
-         y = "",
-         title = "Relationship between median household income and full-time median weekly price for center-based childcare for an infant in California in 2018 ($)"
-    ) +
-    scale_x_continuous(
-        labels = scales::label_dollar()
-    ) + 
-    scale_y_continuous(
-        labels = scales::label_dollar()
-    )
+# Lab 8 question 3 
+# It looks like you are doing the same operations to all of your plot labels. It is time to make a helper function!
+# I added a helper function, make_label so I could delete a lot of repetition in my function 
+# when calling the function I had one categorical variable and two numeric (bill_length_mm, bill_depth_mm). 
+
+clean_label <- function(x) {
+x |> 
+str_replace_all(pattern = "_", 
+                replacement = " ") |> 
+                str_to_title()
+}
+
+make_label <- function(var) {
+  label_raw <- rlang::englue("{{ var }}")
+  clean_label(label_raw)
+}
+
+scatterplot <- function(df, x_var, y_var, color_var) {
+  
+label_x     <- make_label({{ x_var }})
+label_y     <- make_label({{ y_var }})
+label_color <- make_label({{ color_var }})
+label <- rlang::englue("A scatterplot of { label_x } and { label_y } between { label_color }")
+
+df |> 
+ggplot(aes(x = {{ x_var }}, 
+            y = {{ y_var }}, 
+            color = {{ color_var }})) + 
+geom_point(alpha = 0.4) +
+geom_smooth(method = "lm", se = FALSE, alpha = 0.6) + 
+    labs(
+    title = label,
+         subtitle = label_y, 
+        y = "", 
+        x = label_x) + 
+    theme_bw()
+}
+scatterplot(penguins, bill_length_mm, bill_depth_mm, species)
 ```
 
 -   At least one numeric variable and one categorical variable
 
 ```{r}
 #| label: dvs-2-num-cat
-#| Challenge 2 
+# Challenge 2 
 sex_colors <- c("F" = "#e75480",
                 "M" = "#6a5acd") +
 ggplot(data = surveys,
@@ -461,54 +811,32 @@ ggplot(data = surveys,
 
 ```{r}
 #| label: dvs-2-cat
-#| Lab 4 question 7 
-#| Can you reorder the facets so they go in the same order as mine?
-#| I reordered the factets to go in a row and list by Infant, Toddler, and Preschooler 
-    
-ggplot(mapping = aes(x = study_year, 
-                         y = median_price, 
-                         color = fct_reorder2(.f = region, 
-                                             .x = study_year, 
-                                             .y = median_price))
-           ) + 
-    geom_point(size = 0.2,
-               alpha = 0.9) + 
-    geom_smooth(se = FALSE,
-                linewidth = 0.5, 
-                size = 0.6, 
-                alpha = 0.2) +
-    scale_color_manual(values = rainbow(10)
-    ) +
-    facet_wrap(~ age_group, nrow = 1) + 
-    labs(x = "Study Year", 
-         y = "", 
-         title = "Weekly Median Price for Center-Based Childcare($)", 
-         color = "California Region"
-         ) +
-    theme_bw() + 
-    theme(
-      plot.title = element_text(size = 8),
-      axis.text.x = element_text(size = 5),
-      axis.text.y = element_text(size = 5),
-      axis.title.x = element_text(size = 8),
-      legend.title = element_text(size = 8),
-      legend.text = element_text(size = 7),
-      legend.key.height = unit(.4, "cm"),
-      aspect.ratio = 1) +
-    scale_x_continuous(
-        breaks = seq(2008, 2018, by = 2)
+# Lab 10 question 3
+
+results_df |> 
+ggplot(aes(x = (right_family), 
+            y = prop, 
+           fill = factor(n))
+       ) +
+geom_col() +
+  scale_fill_manual(values = ppalette) + 
+   scale_y_continuous(
+        labels = scales::label_percent()
+        ) + 
+labs(x = "Number of Babies Given to Right Family", 
+         y = "",
+         title = "Babies given to right families in the hospital", 
+     subtitle = "y-axis: Percent of babies given to right families out of 10,000", 
+     fill = "Count"
     ) + 
-  scale_y_continuous(
-    limits = c(100,500),
-    breaks = seq(100, 500, by = 100))
+  theme_bw() 
 ```
 
 -   Dates (time series plot)
 
 ```{r}
 #| label: dvs-2-date
-#| Lab 4 question 7 
-
+# Lab 4 question 7 
 
 ggplot(mapping = aes(x = study_year, 
                          y = median_price, 
@@ -554,34 +882,66 @@ ggplot(mapping = aes(x = study_year,
 
 ```{r}
 #| label: dvs-2-ex-1
-#| Lab 2 question 16
-#| Switched x for weight because it had less values and y for the different types of rodents so it is easier to read. 
+# Lab 10 question 3
 
-ggplot(data = surveys, 
-  mapping = aes(x = weight, y = species)
-) + 
-geom_boxplot(outlier.shape = NA) +
-geom_point(color = "steelblue", 
-           alpha = 0.5) + 
-labs( 
-  title = "Relathionship between different types of Rodents and Weight", 
-  subtitle = "Y axis: Species of Rodents",
-  x = "Weight (g)", 
-  y = "")
+results_df |> 
+ggplot(aes(x = (right_family), 
+            y = prop, 
+           fill = factor(n))
+       ) +
+geom_col() +
+  scale_fill_manual(values = ppalette) + 
+   scale_y_continuous(
+        labels = scales::label_percent()
+        ) + 
+labs(x = "Number of Babies Given to Right Family", 
+         y = "",
+         title = "Babies given to right families in the hospital", 
+     subtitle = "y-axis: Percent of babies given to right families out of 10,000", 
+     fill = "Count"
+    ) + 
+  theme_bw() 
 ```
 
 -   I can modify my colors to be accessible to anyone's eyes
 
 ```{r}
 #| label: dvs-2-ex-2
+# Lab 8 question 8 
+# I downlaoded the Scico package to make it accessible to everyone's eyes, so the defualt weren't a harsh red and green. I changed it to a dark purple and light green.
 
+fish |> 
+  map_int(.f = ~ sum(is.na(.x)
+                     )
+          ) |> 
+  enframe(name = "variable", value = "n_missing") |> 
+  arrange(n_missing) |> 
+gt () |> 
+tab_header(
+title = "Number of Missing Values for Fish Measurements", 
+subtitle = "Data Collected from 1989 to 2006 on theBlackfoot Fish River in Montana") |> 
+  tab_style(
+    style = cell_text(weight = "bold"), 
+    locations = cells_column_labels(everything())
+  ) |> 
+  cols_label(
+    variable = "Measurment Variable", 
+    n_missing = "Missing Values"
+  ) |> 
+  data_color(
+    column = n_missing, 
+    colors = scales::col_numeric( 
+    palette = scico(100, palette = "tokyo"), 
+    domain = NULL)
+  )
 ```
 
 -   I can modify my plot titles to clearly communicate the data context
 
 ```{r}
 #| label: dvs-2-ex-3
-#| Lab 2 question 16
+# Lab 2 question 16
+# I added more context, adding location and the years since the data was collected 
 ggplot(
   data = surveys, 
   mapping = aes(x = weight, y = species)
@@ -589,7 +949,7 @@ ggplot(
 geom_boxplot(outlier.shape = NA) +
 geom_point(color = "steelblue", alpha = 0.5) + 
 labs( 
-  title = "Relathionship between different types of Rodents and Weight (g)", 
+  title = "Relathionship between different types of Rodents and Weight (g) located in Portland, Arizona since 1977", 
   subtitle = "Y axis: Species of Rodents",
   x = "Weight (g)", 
   y = "") + 
@@ -600,8 +960,8 @@ labs(
 
 ```{r}
 #| label: dvs-2-ex-4
-#| lab 4 question 7 
-#| I made the chart title bigger and made x and y text smaller, so it is easier to read at first glance. 
+# lab 4 question 7 
+# I made the chart title bigger and made x and y text smaller, so it is easier to read at first glance. 
 ggplot(mapping = aes(x = study_year, 
                          y = median_price, 
                          color = fct_reorder2(.f = region, 
@@ -644,8 +1004,8 @@ ggplot(mapping = aes(x = study_year,
 
 ```{r}
 #| label: dvs-2-ex-5
-#| lab 4 question 7 
-#| colors are in order to align with my plot 
+# lab 4 question 7 
+# colors are in order to align with my plot 
 ca_childcare |> 
     filter(study_year >= 2008, study_year <= 2018) |>
     group_by(region, study_year) |> 
@@ -703,28 +1063,101 @@ ca_childcare |>
 
 ```{r}
 #| label: dvs-3-1-ex-1
-
+# Lab 10 Question 3 
+results_df |> 
+ggplot(aes(x = (right_family), 
+            y = prop, 
+           fill = factor(n))
+       ) +
+geom_col() +
+  scale_fill_manual(values = ppalette) + 
+   scale_y_continuous(
+        labels = scales::label_percent()
+        ) + 
+labs(x = "Number of Babies Given to Right Family", 
+     y = "",
+     title = "Babies given to right families in the hospital", 
+     subtitle = "y-axis: Percent of babies given to right families out of 10,000", 
+     fill = "Count"
+    ) + 
+  theme_bw() 
 ```
 
 -   I can use non-standard colors (Example 2)
 
 ```{r}
 #| label: dvs-3-1-ex-2
+# Lab 8 Question 4
+base_plot <- scatterplot(penguins, bill_length_mm, bill_depth_mm, species)
 
+style_plot(base_plot, 
+          theme_used = theme_minimal(), 
+          palette = rcartocolor::carto_pal(3, "ag_Sunset"),
+          aesthetic = "color"
+)
 ```
 
 -   I can use annotations (e.g., `geom_text()`)
 
 ```{r}
 #| label: dvs-3-2
-
+# lab 10 question 3 
+# I added geom_text(), so I could add the accurate percents on top of the bar plots. 
+results_df |> 
+ggplot(aes(x = (right_family), 
+            y = prop, 
+           fill = factor(n))
+       ) +
+geom_col() + 
+geom_text(
+  aes(label = scales::percent(prop, accuracy = .01)),
+    vjust = -0.1,   
+    size = 2
+  ) +
+  scale_fill_manual(values = ppalette) + 
+   scale_y_continuous(
+        labels = scales::label_percent()
+        ) + 
+labs(x = "Number of Babies Given to Right Family", 
+         y = "",
+         title = "Babies given to right families in the hospital", 
+     subtitle = "y-axis: Percent of babies given to right families out of 10,000", 
+     fill = "Count"
+    ) + 
+  theme_bw() 
 ```
 
 -   I can choose creative geometries (e.g., `geom_segment()`, `geom_ribbon)()`)
 
 ```{r}
 #| label: dvs-3-3
+# Lab 10 Question 13
+ci_df |> 
+mutate(sim = row_number()) |> 
+slice_head(n = 100) |>
 
+ggplot(aes(
+          x = slope_estimate,
+          y = sim, 
+          xmin = conf.low, 
+          xmax = conf.high, 
+          color = factor(cover)
+        ) 
+          ) + 
+geom_linerange() +
+  geom_vline(xintercept = 0.5) + 
+  theme_bw() +
+labs(title = "95% Confidence Interval of Estimated Regression Slope for 100 Tested Dataset", 
+    x = "Slope Coefficient Estimate",
+    y = "", 
+    color = "", 
+    subtitle = "Cl's not included in the population slop are highlighted in red"
+) +
+  theme(
+    axis.ticks.y = element_blank(),
+    axis.text.y  = element_blank(), 
+    legend.position = "none")
+  
 ```
 
 **DVS-4: I can calculate numerical summaries of variables.**
@@ -733,7 +1166,7 @@ ca_childcare |>
 
 ```{r}
 #| label: dvs-4-summarize
-#| lab 3 question 7 
+# lab 3 question 7 
 teacher_evals_clean |>
   distinct(teacher_id, .keep_all = TRUE) |>
   summarize(
@@ -746,7 +1179,22 @@ teacher_evals_clean |>
 
 ```{r}
 #| label: dvs-4-across
-
+# Challange 4 
+# I added an across function so I did not have to repeat the code.  
+summary_of_data <- plot_h_mp |> 
+    group_by(childcare_type) |> 
+    summarize(
+      across(
+        .cols = median_price, 
+        .fns = list(
+            mean = ~ mean(.x, na.rm = TRUE), 
+            price_sd = ~ sd(.x, na.rm = TRUE), 
+            price_min = ~ min(.x, na.rm = TRUE), 
+            price_max = ~ max(.x, na.rm = TRUE)
+        )), 
+        .groups = "drop"
+    )
+summary_of_data
 ```
 
 **DVS-5: I can find summaries of variables across multiple groups.**
@@ -755,7 +1203,7 @@ teacher_evals_clean |>
 
 ```{r}
 #| label: dvs-5-1
-#| Lab 3 question 7 
+# Lab 3 question 7 
 teacher_evals_clean |>
   distinct(teacher_id, .keep_all = TRUE) |>
   group_by(academic_degree, sex) |>
@@ -769,7 +1217,7 @@ teacher_evals_clean |>
 
 ```{r}
 #| label: dvs-5-2
-#| Lab 3 quesion 9
+# Lab 3 quesion 9
 teacher_evals_clean |>
   group_by(teacher_id, course_id) |> 
   summarize(n_questions = n_distinct(question_no)) |>
@@ -783,8 +1231,8 @@ teacher_evals_clean |>
 
 ```{r}
 #| label: dvs-6-ex-1
-#| lab 4 question 5
-#| Can you give your column names better titles, so the reader knows what "2008" and "2018" represent? What are the values stored in these columns?
+# lab 4 question 5
+# Can you give your column names better titles, so the reader knows what "2008" and "2018" represent? What are the values stored in these columns?
 income_info <- ca_childcare |> 
 filter(study_year %in% c(2008, 2018)
 ) |>
@@ -805,14 +1253,30 @@ filter(study_year %in% c(2008, 2018)
 
 ```{r}
 #| label: dvs-6-ex-2
-
+# Lab 9 Question 7
+fish |> 
+  map_int(.f = ~ sum(is.na(.x))) |> 
+  enframe(name = "variable", value = "n_missing") |> 
+  arrange(n_missing) |> 
+gt () |> 
+tab_header(
+title = "Number of Missing Values for Fish Measurements", 
+subtitle = "Data Collected from 1989 to 2006 on theBlackfoot Fish River in Montana") |> 
+  tab_style(
+    style = cell_text(weight = "bold"), 
+    locations = cells_column_labels(everything())
+  ) |> 
+  cols_label(
+    variable = "Measurment Variable", 
+    n_missing = "Missing Values"
+  ) 
 ```
 
 -   I can arrange my table to have an intuitive ordering
 
 ```{r}
 #| label: dvs-6-ex-3
-#| lab 4 question 5
+# lab 4 question 5
 
 income_info <- ca_childcare |> 
 filter(study_year %in% c(2008, 2018)
@@ -837,14 +1301,49 @@ filter(study_year %in% c(2008, 2018)
 
 ```{r}
 #| label: dvs-7-ex-1
-
+# Lab 9 question 8
+fish |> 
+  map_int(.f = ~ sum(is.na(.x))
+          ) |> 
+  enframe(name = "variable", value = "n_missing") |> 
+  arrange(n_missing) |> 
+gt () |> 
+tab_header(
+title = "Number of Missing Values for Fish Measurements", 
+subtitle = "Data Collected from 1989 to 2006 on theBlackfoot Fish River in Montana") |> 
+  tab_style(
+    style = cell_text(weight = "bold"), 
+    locations = cells_column_labels(everything())
+  ) |> 
+  cols_label(
+    variable = "Measurment Variable", 
+    n_missing = "Missing Values"
+  ) |> 
+  data_color(
+    column = n_missing, 
+    colors = scales::col_numeric( 
+    palette = scico(100, palette = "tokyo"), 
+    domain = NULL
+  ))
 ```
 
 -   I can modify the layout of my table to be more readable (e.g., `pivot_longer()` or `pivot_wider()`)
 
 ```{r}
 #| label: dvs-7-ex-2
-
+# Lab 8 Question 2
+count_wide <- function(df, row_var, col_var) {
+if (!is.data.frame(df)) {
+    stop("Input `df` must be a data frame.")
+  }
+df |> 
+count({{ row_var }}, {{ col_var }}) |> 
+pivot_wider (
+            names_from = {{ col_var }}, 
+            values_from = n, 
+            values_fill = 0) |> 
+janitor::adorn_totals(where = c("row", "col"))
+}
 ```
 
 ## Program Efficiency
@@ -855,21 +1354,57 @@ filter(study_year %in% c(2008, 2018)
 
 ```{r}
 #| label: pe-1-one-call
+# lab 8 question 3
+# It looks like you are doing the same operations to all of your plot labels. It is time to make a helper function!
+# I added a helper function, make_label so I could delete a lot of repetition in my function 
+# when calling the function I had one categorical variable and two numeric (bill_length_mm, bill_depth_mm). 
+# revised to put in portfolio
+clean_label <- function(x) {
+x |> 
+str_replace_all(pattern = "_", 
+                replacement = " ") |> 
+                str_to_title()
+}
 
+make_label <- function(var) {
+  label_raw <- rlang::englue("{{ var }}")
+  clean_label(label_raw)
+}
+
+scatterplot <- function(df, x_var, y_var, color_var) {
+  
+  label_x     <- make_label({{ x_var }})
+  label_y     <- make_label({{ y_var }})
+  label_color <- make_label({{ color_var }})
+  label <- rlang::englue("A scatterplot of { label_x } and { label_y } between { label_color }")
+
+df |> 
+ggplot(aes(x = {{ x_var }}, 
+            y = {{ y_var }}, 
+            color = {{ color_var }})) + 
+geom_point(alpha = 0.4) +
+geom_smooth(method = "lm", se = FALSE, alpha = 0.6) + 
+    labs(
+    title = label,
+         subtitle = label_y, 
+        y = "", 
+        x = label_x) + 
+    theme_bw()
+}
 ```
 
 -   using `across()`
 
 ```{r}
 #| label: pe-1-across
-#| lab 3 question 5 
+# lab 3 question 5 
 teacher_evals_clean <- teacher_evals |>
     rename(sex = gender) |>
     filter(no_participants >= 10) |>
     mutate(
         across(c(teacher_id, 
                  course_id),                          
-               as.character),
+                  as.character),
         across(c(academic_degree, 
                  sex), 
                as.factor)
@@ -890,7 +1425,30 @@ teacher_evals_clean <- teacher_evals |>
 
 ```{r}
 #| label: pe-1-map-1
-
+# Lab 9 Question 8 
+fish |> 
+  map_int(.f = ~ sum(is.na(.x))
+          ) |> 
+  enframe(name = "variable", value = "n_missing") |> 
+  arrange(n_missing) |> 
+gt () |> 
+tab_header(
+title = "Number of Missing Values for Fish Measurements", 
+subtitle = "Data Collected from 1989 to 2006 on theBlackfoot Fish River in Montana") |> 
+  tab_style(
+    style = cell_text(weight = "bold"), 
+    locations = cells_column_labels(everything())
+  ) |> 
+  cols_label(
+    variable = "Measurment Variable", 
+    n_missing = "Missing Values"
+  ) |> 
+  data_color(
+    column = n_missing, 
+    colors = scales::col_numeric( 
+    palette = scico(100, palette = "tokyo"), 
+    domain = NULL
+  ))
 ```
 
 **PE-2: I can write functions to reduce repetition in my code.**
@@ -899,21 +1457,54 @@ teacher_evals_clean <- teacher_evals |>
 
 ```{r}
 #| label: pe-2-1
+# lab 7 question 4 
+rescale_01 <- function(vec){
+if(!is.numeric(vec)) {
+ stop("Argument input for vec is not numeric")
+} 
+if(length(vec) <= 1) {
+stop("Argument input is not greater than one")
+}
+  rng <- range(vec, na.rm = TRUE) 
+  (vec - rng[1]) / (rng[2] - rng[1])
 
+}
 ```
 
 -   Example 2: Function that operates on data frames
 
 ```{r}
 #| label: pe-2-2
+# lab 8 question 2 
+# Input checks for data frame functions are tricky, but an easy one is to check if the data frame being input is actually a data frame (not a vector or a matrix).
+# I made the function only accept data frames 
 
+count_wide <- function(df, row_var, col_var) {
+if (!is.data.frame(df)) {
+    stop("Input `df` must be a data frame.")
+  }
+df |> 
+count({{ row_var }}, {{ col_var }}
+      ) |> 
+pivot_wider (
+            names_from = {{ col_var }}, 
+            values_from = n, 
+            values_fill = 0) |> 
+janitor::adorn_totals(where = c("row", "col"))
+}
 ```
 
 -   Example 3: Function that operates on vectors *or* data frames
 
 ```{r}
 #| label: pe-2-3
-
+# lab 9 question 3 
+clean_label <- function(x) {
+x |> 
+str_replace_all(pattern = "_", 
+                replacement = " ") |> 
+                str_to_title()
+}
 ```
 
 **PE-3:I can use iteration to reduce repetition in my code.**
@@ -922,6 +1513,54 @@ teacher_evals_clean <- teacher_evals |>
 
 ```{r}
 #| label: pe-3-across
+# Lab 9 Question 5
+# I added across so code did not have repeat itself with calling a string to replace _ with " ", and captilzation. 
+evals <- evals|> 
+mutate(
+  seniority_num = as.numeric(seniority),
+  seniority = case_when(
+          seniority <= 4 ~ "Junior", 
+          seniority > 4 & seniority <= 8 ~ "Senior", 
+          seniority > 8 ~ "Super senior", 
+          TRUE ~ NA_character_
+), 
+seniority = factor(
+      seniority,
+      levels = c("Junior", "Senior", "Super senior")
+    ) )
+summarize_table <- function(df, ...) {
+df |> 
+  select(...) |> 
+  mutate(across(everything(), as.character)) |>
+  pivot_longer(
+  cols = everything(), 
+  names_to = "variable", 
+  values_to = "level"
+  ) |> 
+count(variable, level, name = "n") |> 
+group_by(variable) |> 
+mutate(prop = n / sum(n)) |> 
+ungroup() |> 
+    mutate(
+      across(
+        .cols = c(variable, level),
+      ~ .x |> 
+        str_replace_all( pattern = "_", 
+                        replacement = " ") |> 
+         str_to_title ())
+    ) |> 
+gt () |> 
+tab_style(
+    style = cell_text(weight = "bold"), 
+    locations = cells_column_labels(everything())
+  ) 
+}
+summary_tbl <- summarize_table(evals,
+  academic_degree,
+  seniority,
+  sex
+)
+summary_tbl
 
 ```
 
@@ -929,7 +1568,23 @@ teacher_evals_clean <- teacher_evals |>
 
 ```{r}
 #| label: pe-3-map-1
-
+# lab 9 question 7 
+fish |> 
+  map_int(.f = ~ sum(is.na(.x))) |> 
+  enframe(name = "variable", value = "n_missing") |> 
+  arrange(n_missing) |> 
+gt () |> 
+tab_header(
+title = "Number of Missing Values for Fish Measurements", 
+subtitle = "Data Collected from 1989 to 2006 on theBlackfoot Fish River in Montana") |> 
+  tab_style(
+    style = cell_text(weight = "bold"), 
+    locations = cells_column_labels(everything())
+  ) |> 
+  cols_label(
+    variable = "Measurment Variable", 
+    n_missing = "Missing Values"
+  ) 
 ```
 
 -   using a `map()` function with **more than one** input (e.g., `map_2()` or `pmap()`)
@@ -945,14 +1600,29 @@ teacher_evals_clean <- teacher_evals |>
 
 ```{r}
 #| label: pe-4-1
-
+# Challange 4 
+# I added an across function so I did not have to repeat the code.  
+summary_of_data <- plot_h_mp |> 
+    group_by(childcare_type) |> 
+    summarize(
+      across(
+        .cols = median_price, 
+        .fns = list(
+            mean = ~ mean(.x, na.rm = TRUE), 
+            price_sd = ~ sd(.x, na.rm = TRUE), 
+            price_min = ~ min(.x, na.rm = TRUE), 
+            price_max = ~ max(.x, na.rm = TRUE)
+        )), 
+        .groups = "drop"
+    )
+summary_of_data
 ```
 
 -   I can connect a data wrangling pipeline into a `ggplot()`
 
 ```{r}
 #| label: pe-4-2
-#| lab 4 question 7
+# lab 4 question 7
 ca_childcare |> 
     filter(study_year >= 2008, study_year <= 2018) |>
     group_by(region, study_year) |> 
@@ -1012,14 +1682,26 @@ ca_childcare |>
 
 ```{r}
 #| label: dsm-1-1
+#| # lab 10 Question 1
 
+set.seed(4)
+results <- map_int(.x = 1:10000,
+                   .f = ~ randomBabies(n_babies = 4)
+                  )
 ```
 
 -   Example 2
 
 ```{r}
 #| label: dsm-1-2
+# lab 10 Question 10
 
+set.seed(5)
+ci_dat <- map(.x = 1:1000,
+              .f = ~ mycifun(beta0 = 3, 
+                             beta1 = 0.5,
+                              n = 100)
+              )
 ```
 
 **DSSM-2: I can conduct common statistical analyses in R.**
@@ -1028,9 +1710,10 @@ ca_childcare |>
 
 ```{r}
 #| label: dsm-2-1
-#| lab 4 question 9 
-#| What are x and y in this equation? The context is important to consider!
-#| In the formula reg_mod1 y is prediected by x. 
+# lab 4 question 9 
+# What are x and y in this equation? The context is important to consider!
+# In the formula reg_mod1 y is prediected by x. 
+
 reg_mod1 <- lm(mhi_2018 ~ mc_infant, data = median_mc_infant)
 summary(reg_mod1)
 ```
@@ -1039,9 +1722,9 @@ summary(reg_mod1)
 
 ```{r}
 #| label: dsm-2-2
-#| Challenge 3 question 3 
-#| This works, but did you need to make a contingency table? Could you have input these vectors directly into the chisq.test() function?
-#| I deleted the contingency table and just had chisq.table build the table for me with just x and y. 
+# Challenge 3 question 3 
+# This works, but did you need to make a contingency table? Could you have input these vectors directly into the chisq.test() function?
+# I deleted the contingency table and just had chisq.table build the table for me with just x and y. 
 
 chisq.table(teacher_evals_compare$set_level, 
             teacher_evals_compare$sen_level)
@@ -1052,7 +1735,10 @@ chisq.table(teacher_evals_compare$set_level,
 
 ```{r}
 #| label: dsm-2-3
+# Lab 2 Question 18
 
+species_mod <- aov(weight ~ species, data = surveys_clean)
+summary(species_mod)
 ```
 
 ## Revising My Thinking
