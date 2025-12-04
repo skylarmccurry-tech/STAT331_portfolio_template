@@ -3,6 +3,7 @@ title: "STAT 331 Portfolio"
 author: "Skylar McCurry!"
 format: html
 editor: visual
+embed-resources: true
 execute:
   eval: false
   echo: true
@@ -97,6 +98,7 @@ filter(study_year %in% c(2008, 2018)
 ```{r}
 #| label: wd-2-ex-2
 # Lab 10 Question 8 
+# revised for portfolio 
 mycifun <- function(beta0, beta1, n){
 
 x <- runif(n = n, 
@@ -137,6 +139,7 @@ mutate(
 ```{r}
 #| label: wd-2-ex-3
 # Lab 3 Question 9
+# changed for portfolio 
 teacher_evals_clean |>
   group_by(teacher_id, course_id) |> 
   summarize(n_questions = n_distinct(question_no)
@@ -158,7 +161,8 @@ teacher_evals_clean |>
 ca_childcare |> 
 group_by(region) |>
 filter(study_year == 2018) |> 
-summarize(mc_infant = median(mc_infant, na.rm = TRUE)) |>
+summarize(mc_infant = median(mc_infant, na.rm = TRUE)
+          ) |>
 slice_min(mc_infant)
 ```
 
@@ -250,7 +254,8 @@ seniority = factor(
 summarize_table <- function(df, ...) {
 df |> 
   select(...) |> 
-  mutate(across(everything(), as.character)) |>
+  mutate(across(everything(), as.character)
+         ) |>
   pivot_longer(
   cols = everything(), 
   names_to = "variable", 
@@ -258,7 +263,8 @@ df |>
   ) |> 
 count(variable, level, name = "n") |> 
 group_by(variable) |> 
-mutate(prop = n / sum(n)) |> 
+mutate(prop = n / sum(n)
+       ) |> 
 ungroup() |> 
     mutate(
       variable = variable |> 
@@ -268,7 +274,8 @@ ungroup() |>
        level = level |> 
     str_replace_all( pattern = "_", 
                         replacement = " ")   |>
-    str_to_title () ) |> 
+    str_to_title () 
+    ) |> 
 gt () |> 
 tab_style(
     style = cell_text(weight = "bold"), 
@@ -319,7 +326,7 @@ ca_childcare |>
         mc_infant = median(mc_infant, na.rm = TRUE),
         mc_toddler = median(mc_toddler, na.rm = TRUE),
         mc_preschool = median(mc_preschool, na.rm = TRUE),
-        .groups = "drop")|> 
+        .groups = "drop") |> 
     pivot_longer( 
                  cols = starts_with("mc_"), 
                  names_to = "age_group", 
@@ -352,7 +359,8 @@ seniority = factor(
 summarize_table <- function(df, ...) {
 df |> 
   select(...) |> 
-  mutate(across(everything(), as.character)) |>
+  mutate(across(everything(), as.character)
+         ) |>
   pivot_longer(
   cols = everything(), 
   names_to = "variable", 
@@ -360,7 +368,8 @@ df |>
   ) |> 
 count(variable, level, name = "n") |> 
 group_by(variable) |> 
-mutate(prop = n / sum(n)) |> 
+mutate(prop = n / sum(n)
+       ) |> 
 ungroup() |> 
     mutate(
       variable = variable |> 
@@ -370,7 +379,8 @@ ungroup() |>
        level = level |> 
     str_replace_all( pattern = "_", 
                         replacement = " ")   |>
-    str_to_title () ) |> 
+    str_to_title ()
+    ) |> 
 gt () |> 
 tab_style(
     style = cell_text(weight = "bold"), 
@@ -634,6 +644,8 @@ The following assignments satisfy the above criteria:
 
 ```{r}
 #| label: r-2-1
+# lab 4 question 8 
+# chanaged label_dollar to label_currency 
 plot_median_mc_infant <- median_mc_infant |> 
     ggplot(mapping = aes(x = mc_infant, 
                          y = mhi_2018)
@@ -646,10 +658,10 @@ plot_median_mc_infant <- median_mc_infant |>
          title = "Relationship between median household income and full-time median weekly price for center-based childcare for an infant in California in 2018 ($)"
     ) +
     sale_x_continuous(
-        labels = scales::label_dollar()
+        labels = scales::label_currency()
     ) + 
     scale_y_continuous(
-        labels = scales::label_dollar()
+        labels = scales::label_currency()
     )
 ```
 
@@ -1220,7 +1232,8 @@ teacher_evals_clean |>
 # Lab 3 quesion 9
 teacher_evals_clean |>
   group_by(teacher_id, course_id) |> 
-  summarize(n_questions = n_distinct(question_no)) |>
+  summarize(n_questions = n_distinct(question_no)
+            ) |>
   filter(n_questions == 9) |> 
   select(teacher_id, course_id)
 ```
@@ -1255,7 +1268,8 @@ filter(study_year %in% c(2008, 2018)
 #| label: dvs-6-ex-2
 # Lab 9 Question 7
 fish |> 
-  map_int(.f = ~ sum(is.na(.x))) |> 
+  map_int(.f = ~ sum(is.na(.x))
+          ) |> 
   enframe(name = "variable", value = "n_missing") |> 
   arrange(n_missing) |> 
 gt () |> 
@@ -1381,7 +1395,8 @@ scatterplot <- function(df, x_var, y_var, color_var) {
 df |> 
 ggplot(aes(x = {{ x_var }}, 
             y = {{ y_var }}, 
-            color = {{ color_var }})) + 
+            color = {{ color_var }})
+       ) + 
 geom_point(alpha = 0.4) +
 geom_smooth(method = "lm", se = FALSE, alpha = 0.6) + 
     labs(
@@ -1591,7 +1606,14 @@ subtitle = "Data Collected from 1989 to 2006 on theBlackfoot Fish River in Monta
 
 ```{r}
 #| label: pe-3-map-2
+# lab 10 question 10 
+set.seed(5)
 
+ci_dat <- map(.x = 1:1000,
+              .f = ~ mycifun(beta0 = 3, 
+                             beta1 = 0.5,
+                              n = 100)
+              )
 ```
 
 **PE-4: I can use modern tools when carrying out my analysis.**
@@ -1602,6 +1624,7 @@ subtitle = "Data Collected from 1989 to 2006 on theBlackfoot Fish River in Monta
 #| label: pe-4-1
 # Challange 4 
 # I added an across function so I did not have to repeat the code.  
+# revised for portfolio 
 summary_of_data <- plot_h_mp |> 
     group_by(childcare_type) |> 
     summarize(
