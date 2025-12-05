@@ -2,6 +2,14 @@
 title: "Lightening Round Essays"
 format: html
 editor: visual
+execute:
+  eval: false
+  echo: true
+  warning: false
+  message: false
+code-tools: true
+code-fold: true
+embed-resources: true
 ---
 
 **Answer each of the following questions with *one sentence* including a brief explanation.**
