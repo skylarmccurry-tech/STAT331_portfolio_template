@@ -12,7 +12,7 @@ If Sam doesn’t earn an A, then no one should, because I was partners with him 
 
 2.  What was the most difficult part of the class for you? List a general topic, a specific problem, a kind of work we did, etc. and explain why.
 
-The most difficult part of the class for me was combining everything I learned from previous weeks and applying it to the new material each week.
+The most difficult part of the class for me was combining everything I learned from previous weeks and applying it to the new material each week. I also learned a lot more about my computer, and where things are stored.
 
 3.  What was the easiest part of the class for you? Explain why.
 
@@ -24,4 +24,4 @@ The part of the class that surprised me the most was realizing that I could comb
 
 5.  Give one piece of advice to a student just beginning a quarter of STAT 331 that will help them be successful in learning.
 
-I definitely recommend going back and practicing the code or topics you don’t fully understand, so you can execute them perfectly in future labs.
+I definitely recommend going back and practicing the code or topics you don’t fully understand, so you can execute them perfectly in future labs, and keeping on top of your work because it adds up!
