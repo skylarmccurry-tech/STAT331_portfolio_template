@@ -185,11 +185,14 @@ filter(study_year %in% c(2008, 2018)
 ```{r}
 #| label: wd-3-character
 # lab 5 
-person_suspect <- person |> 
-filter(license_id %in% c("423327", "664760")
-) 
-get_fit_now_murder <- get_fit_now_member |> 
-    filter(name %in% c("Tushar Chandra", "Jeremy Bowers")) 
+drivers_license_real <- drivers_license |> 
+    filter(
+        hair_color == "red", 
+        gender == "female", 
+        car_make == "Tesla", 
+        car_model == "Model S", 
+        height >= 65, 
+        height <= 67) 
 ```
 
 -   Character Example 2 (example must use functions from **stringr**)
@@ -240,44 +243,9 @@ mutate(
 seniority = factor(
       seniority,
       levels = c("Junior", "Senior", "Super senior")
-    ) )
-summarize_table <- function(df, ...) {
-df |> 
-  select(...) |> 
-  mutate(across(everything(), as.character)
-         ) |>
-  pivot_longer(
-  cols = everything(), 
-  names_to = "variable", 
-  values_to = "level"
-  ) |> 
-count(variable, level, name = "n") |> 
-group_by(variable) |> 
-mutate(prop = n / sum(n)
-       ) |> 
-ungroup() |> 
-    mutate(
-      variable = variable |> 
-        str_replace_all( pattern = "_", 
-                        replacement = " ") |> 
-         str_to_title (), 
-       level = level |> 
-    str_replace_all( pattern = "_", 
-                        replacement = " ")   |>
-    str_to_title () 
-    ) |> 
-gt () |> 
-tab_style(
-    style = cell_text(weight = "bold"), 
-    locations = cells_column_labels(everything())
-  ) 
-}
-summary_tbl <- summarize_table(evals,
-  academic_degree,
-  seniority,
-  sex
+    ) 
 )
-summary_tbl
+
 ```
 
 -   Numeric Example 2
@@ -362,14 +330,12 @@ mutate(prop = n / sum(n)
        ) |> 
 ungroup() |> 
     mutate(
-      variable = variable |> 
+      across(
+        .cols = c(variable, level),
+      ~ .x |> 
         str_replace_all( pattern = "_", 
                         replacement = " ") |> 
-         str_to_title (), 
-       level = level |> 
-    str_replace_all( pattern = "_", 
-                        replacement = " ")   |>
-    str_to_title ()
+         str_to_title ())
     ) |> 
 gt () |> 
 tab_style(
@@ -499,13 +465,7 @@ ca_childcare <- inner_join(x = counties,
 #| label: wd-5-inner-ex-2
 # lab 5 
 # I changed my orginal code to inner_join because it was fewer steps than filtering between two different data sets. Revised to put in portfolio
-filter(
-        hair_color == "red", 
-        gender == "female", 
-        car_make == "Tesla", 
-        car_model == "Model S", 
-        height >= 65, 
-        height <= 67) 
+
 suspect <- drivers_license_real |> 
   inner_join(person, by = c("id" = "license_id"))
 ```
@@ -518,11 +478,7 @@ suspect <- drivers_license_real |>
 #| label: wd-6-semi
 # lab 5 
 # I changed filter to semi join so it would drop all numbers that do not have a match, and it is easier than filtering specific numbers. Revised to put in portfolio
-drivers_license_1 <- drivers_license |> 
-    filter(
-        gender == "male",
-        str_detect(plate_number, "H42W")
-    ) 
+
 person_suspect <- person |> 
  semi_join(
    drivers_license_1, 
@@ -569,9 +525,9 @@ df |>
   mutate(across(everything(), as.character)
          ) |>
   pivot_longer(
-              cols = everything(), 
-              names_to = "variable", 
-              values_to = "level"
+  cols = everything(), 
+  names_to = "variable", 
+  values_to = "level"
   ) |> 
 count(variable, level, name = "n") |> 
 group_by(variable) |> 
@@ -579,14 +535,12 @@ mutate(prop = n / sum(n)
        ) |> 
 ungroup() |> 
     mutate(
-      variable = variable |> 
+      across(
+        .cols = c(variable, level),
+      ~ .x |> 
         str_replace_all( pattern = "_", 
                         replacement = " ") |> 
-        str_to_title (), 
-       level = level |> 
-    str_replace_all( pattern = "_", 
-                        replacement = " ")   |>
-    str_to_title () 
+         str_to_title ())
     ) |> 
 gt () |> 
 tab_style(
@@ -720,7 +674,8 @@ stop("Argument input is not greater than one")
 # Input checks for data frame functions are tricky, but an easy one is to check if the data frame being input is actually a data frame (not a vector or a matrix).
 # I deleted the missing from function argument and then I also added !is.data.frame to make sure the function only accepts a data frame. 
 count_wide <- function(df, row_var, col_var) {
-if (!is.data.frame(df)) {
+if (!is.data.frame(df)
+    ) {
     stop("Input `df` must be a data frame.")
   }
 df |> 
